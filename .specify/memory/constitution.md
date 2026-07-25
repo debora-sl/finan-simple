@@ -1,50 +1,140 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Relatório de Impacto de Sincronização
+=====================================
+Versão: (inicial) → 1.0.0
+Tipo de alteração: MAJOR (ratificação inicial — princípios definidos a partir do CLAUDE.md/AGENTS.md)
 
-## Core Principles
+Princípios definidos:
+  - I. Interface com shadcn/ui e Design Tokens
+  - II. Camada de Dados Isolada (Prisma apenas em @data)
+  - III. Server Actions Seguras (next-safe-action)
+  - IV. Clean Code e Convenções de TypeScript
+  - V. Documentação e Código via MCP (Context7 e Serena)
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+Seções adicionadas:
+  - Restrições de Stack Tecnológico
+  - Fluxo de Desenvolvimento e Portões de Qualidade
+  - Governança
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Seções removidas: nenhuma
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+Templates verificados:
+  - ✅ .specify/templates/plan-template.md (Constitution Check genérico — compatível)
+  - ✅ .specify/templates/spec-template.md (sem conflitos com os princípios)
+  - ✅ .specify/templates/tasks-template.md (categorias de tarefas compatíveis)
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+TODOs pendentes: nenhum
+-->
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+# Constituição do finan-simple
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Princípios Fundamentais
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### I. Interface com shadcn/ui e Design Tokens
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+O shadcn/ui É a biblioteca de componentes oficial do projeto. Antes de construir qualquer
+componente, o desenvolvedor DEVE verificar se já existe um componente do shadcn/ui que atenda
+ao objetivo; criar componentes do zero é PROIBIDO quando houver equivalente disponível. Regras
+não negociáveis de estilo e renderização:
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- Cores DEVEM vir exclusivamente dos tokens de tema definidos em `app/globals.css`; cores
+  hard-coded do Tailwind são PROIBIDAS.
+- Todas as medidas DEVEM usar `rem`; `px` é PROIBIDO.
+- Ícones DEVEM ser renderizados com a biblioteca `lucide-react`.
+- Imagens DEVEM usar o componente `Image` do Next.js.
+- O botão de fechar do `Sheet` NUNCA deve ser criado manualmente — ele já é fornecido pelo componente.
+- Antes de inserir um footer, os arquivos `layout.tsx` DEVEM ser inspecionados para evitar
+  renderização duplicada.
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+**Racional**: Consistência visual, acessibilidade e manutenção previsível dependem de um único
+sistema de design e de tokens centralizados, não de decisões pontuais por tela.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### II. Camada de Dados Isolada
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+O Prisma NUNCA deve ser chamado diretamente de componentes. Todo acesso a dados DEVE ser
+encapsulado em funções na pasta `data/`, seguindo o padrão já estabelecido em `app/page.tsx`.
+Componentes consomem dados apenas por meio dessas funções.
+
+**Racional**: Isolar o acesso a dados mantém componentes declarativos, permite reuso e teste da
+lógica de persistência e evita vazamento de detalhes de infraestrutura para a camada de UI.
+
+### III. Server Actions Seguras
+
+Toda Server Action DEVE ser criada com a biblioteca `next-safe-action` e residir na pasta
+`actions/`, usando `actions/create-booking.ts` como referência. Regras não negociáveis:
+
+- Actions protegidas DEVEM usar o `protectedActionClient` (ver `lib/action-client.ts`).
+- A validação de esquema DEVE usar `.inputSchema`; o uso de `.schema` é PROIBIDO.
+- Toda action DEVE realizar validação de autenticação e autorização conforme o usuário.
+- A chamada de uma Server Action a partir do cliente DEVE usar o hook `useAction` do
+  `next-safe-action`.
+
+**Racional**: Padronizar a criação e o consumo de actions garante validação de entrada,
+tratamento de erros e checagens de segurança consistentes em todas as operações de servidor.
+
+### IV. Clean Code e Convenções de TypeScript
+
+Todo código DEVE ser escrito em TypeScript, limpo, conciso e de fácil manutenção, seguindo os
+princípios SOLID, Clean Code e DRY. Regras não negociáveis:
+
+- Nomes de variáveis DEVEM ser descritivos (ex.: `isLoading`, `hasError`).
+- Nomes de pastas e arquivos DEVEM usar kebab-case.
+- Código duplicado DEVE ser evitado por meio de funções e componentes reutilizáveis.
+- Comentários no código são PROIBIDOS.
+- Erros de ESLint DEVEM ser corrigidos antes de concluir qualquer alteração.
+
+**Racional**: Convenções uniformes reduzem carga cognitiva, facilitam revisão e mantêm a base de
+código previsível à medida que ela cresce.
+
+### V. Documentação e Código via MCP
+
+O MCP do Context7 DEVE ser usado para buscar documentações, sites e APIs de bibliotecas,
+frameworks e ferramentas — mesmo as conhecidas — pois versões podem conter mudanças recentes. O
+MCP do Serena DEVE ser usado para recuperação semântica de código e edição. Como as versões deste
+projeto contêm breaking changes, o guia relevante em `node_modules/next/dist/docs/` DEVE ser lido
+antes de escrever código de Next.js, respeitando avisos de depreciação (ver `AGENTS.md`).
+
+**Racional**: Depender de documentação atualizada em vez de conhecimento presumido evita o uso de
+APIs obsoletas e reduz retrabalho causado por mudanças de versão.
+
+## Restrições de Stack Tecnológico
+
+A stack oficial do projeto É fixa e DEVE ser respeitada:
+
+- Gerenciador de pacotes: **pnpm**.
+- Framework: **Next.js 16** com **React 19**.
+- ORM/Banco: **Prisma 7** (esquema em `prisma/schema.prisma`).
+- Componentes: **shadcn/ui** com **Tailwind CSS**.
+- Autenticação: **Better Auth**.
+- Server Actions: **next-safe-action**.
+- Ícones: **lucide-react**.
+
+Introduzir dependências que substituam ou dupliquem responsabilidades da stack acima DEVE ser
+justificado na seção de Complexity Tracking do plano correspondente.
+
+## Fluxo de Desenvolvimento e Portões de Qualidade
+
+- `npm run dev` NUNCA deve ser executado para validar mudanças.
+- Antes de concluir uma alteração, o ESLint DEVE passar sem erros.
+- Toda nova funcionalidade que acesse dados DEVE incluir a função correspondente em `data/`, e
+  toda operação de servidor DEVE ser exposta como Server Action em `actions/`.
+- Revisões DEVEM verificar conformidade com todos os princípios desta constituição; violações DEVEM
+  ser corrigidas ou justificadas explicitamente.
+
+## Governança
+
+Esta constituição prevalece sobre quaisquer outras práticas do projeto. Emendas DEVEM ser
+documentadas nesta arquivo, aprovadas e acompanhadas de justificativa e, quando aplicável, de um
+plano de migração.
+
+O versionamento segue Semantic Versioning:
+
+- **MAJOR**: remoção ou redefinição incompatível de princípios ou de regras de governança.
+- **MINOR**: adição de um novo princípio/seção ou expansão material de orientação existente.
+- **PATCH**: esclarecimentos, correções de redação e refinamentos não semânticos.
+
+Toda alteração de código e toda revisão DEVEM confirmar conformidade com os princípios aqui
+definidos. O arquivo `CLAUDE.md` (que inclui `AGENTS.md`) permanece como guia operacional de
+desenvolvimento em tempo de execução e DEVE estar alinhado a esta constituição.
+
+**Version**: 1.0.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-25
