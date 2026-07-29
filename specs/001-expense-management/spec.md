@@ -8,6 +8,16 @@
 
 **Input**: User description: "Crie um sistema de gestão de despesas, com autenticação de usuários. O usuário pode criar conta e fazer login (nome, e-mail e senha). O usuário pode criar despesas. O usuário pode criar categorias de despesas. O usuário pode, para cada despesa, marcar quais foram pagas. O usuário deve conseguir visualizar uma dashboard."
 
+## Clarifications
+
+### Session 2026-07-29
+
+- Q: Qual a precisão dos valores monetários das despesas? → A: Exatamente 2 casas decimais (centavos), com teto amplo; entrada com mais casas é rejeitada/arredondada.
+- Q: Qual o escopo temporal padrão dos totais da dashboard? → A: Todas as despesas do usuário (histórico completo), sem recorte de período nesta versão.
+- Q: Qual o requisito mínimo de senha no cadastro? → A: Mínimo de 8 caracteres, sem exigência de complexidade.
+- Q: Um usuário pode ter categorias com nome idêntico? → A: Não; nome de categoria é único por usuário (case-insensitive).
+- Q: Qual a moeda padrão e formatação da UI? → A: BRL (R$) com formatação pt-BR (`R$ 1.234,56`).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Autenticação de Usuário (Priority: P1)
@@ -109,30 +119,30 @@ Um usuário autenticado acessa uma dashboard que resume sua situação financeir
 
 ### Functional Requirements
 
-- **FR-001**: O sistema DEVE permitir que um visitante crie uma conta informando nome, e-mail e senha.
+- **FR-001**: O sistema DEVE permitir que um visitante crie uma conta informando nome, e-mail e senha, exigindo senha com no mínimo 8 caracteres (sem regra de complexidade obrigatória).
 - **FR-002**: O sistema DEVE validar que o e-mail informado no cadastro tem formato válido e ainda não está associado a outra conta.
 - **FR-003**: O sistema DEVE permitir que um usuário cadastrado entre na sua conta com e-mail e senha, e negar acesso quando as credenciais forem inválidas.
 - **FR-004**: O sistema DEVE permitir que um usuário autenticado encerre a sua sessão.
 - **FR-005**: O sistema DEVE restringir o acesso às despesas, categorias e dashboard a usuários autenticados.
 - **FR-006**: O sistema DEVE garantir que cada usuário acesse e gerencie exclusivamente os próprios dados (despesas e categorias), impedindo acesso aos dados de outros usuários.
 - **FR-007**: O sistema DEVE permitir que um usuário autenticado crie uma despesa contendo, no mínimo, descrição, valor monetário e data.
-- **FR-008**: O sistema DEVE validar que o valor de uma despesa é um montante monetário positivo.
+- **FR-008**: O sistema DEVE validar que o valor de uma despesa é um montante monetário positivo, com exatamente 2 casas decimais (centavos); entradas com mais casas decimais DEVEM ser rejeitadas ou arredondadas para 2 casas antes de serem persistidas.
 - **FR-009**: O sistema DEVE permitir que um usuário autenticado consulte a lista das suas despesas.
 - **FR-010**: O sistema DEVE permitir que um usuário autenticado edite e remova as suas despesas.
-- **FR-011**: O sistema DEVE permitir que um usuário autenticado crie categorias de despesa informando um nome.
+- **FR-011**: O sistema DEVE permitir que um usuário autenticado crie categorias de despesa informando um nome, garantindo que o nome seja único por usuário (comparação case-insensitive) e recusando nomes duplicados com mensagem clara.
 - **FR-012**: O sistema DEVE permitir que um usuário autenticado consulte, edite e remova as suas categorias.
 - **FR-013**: O sistema DEVE permitir associar uma categoria a uma despesa no momento da criação ou edição da despesa.
 - **FR-014**: O sistema DEVE tratar de forma previsível as despesas de uma categoria removida, mantendo-as sem categoria em vez de excluí-las.
 - **FR-015**: O sistema DEVE permitir que um usuário marque cada despesa como paga ou não paga, e alterne esse estado a qualquer momento.
-- **FR-016**: O sistema DEVE exibir uma dashboard que apresente, no mínimo, o total das despesas do usuário, os totais pagos e pendentes e a distribuição de gastos por categoria.
+- **FR-016**: O sistema DEVE exibir uma dashboard que apresente, no mínimo, o total das despesas do usuário, os totais pagos e pendentes e a distribuição de gastos por categoria, considerando todas as despesas do usuário (histórico completo), sem recorte de período.
 - **FR-017**: A dashboard DEVE apresentar um estado vazio informativo quando o usuário não possuir despesas registradas.
 - **FR-018**: O sistema DEVE exibir mensagens claras de erro e validação quando uma ação for recusada.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Usuário**: Pessoa que utiliza o sistema. Atributos principais: nome, e-mail (único) e credencial de acesso (senha). Possui muitas despesas e muitas categorias.
-- **Categoria**: Rótulo de organização de despesas criado por um usuário. Atributos principais: nome. Pertence a um usuário e pode estar associada a muitas despesas.
-- **Despesa**: Registro de um gasto do usuário. Atributos principais: descrição, valor monetário, data, estado de pagamento (paga ou não paga) e categoria opcional. Pertence a um usuário.
+- **Categoria**: Rótulo de organização de despesas criado por um usuário. Atributos principais: nome (único por usuário, case-insensitive). Pertence a um usuário e pode estar associada a muitas despesas.
+- **Despesa**: Registro de um gasto do usuário. Atributos principais: descrição, valor monetário (positivo, 2 casas decimais), data, estado de pagamento (paga ou não paga) e categoria opcional. Pertence a um usuário.
 
 ## Success Criteria *(mandatory)*
 
@@ -150,7 +160,7 @@ Um usuário autenticado acessa uma dashboard que resume sua situação financeir
 - A autenticação é baseada em e-mail e senha, sem provedores externos (SSO/OAuth) nesta versão.
 - Cada despesa possui no máximo uma categoria; categorias compartilhadas entre múltiplas despesas do mesmo usuário são permitidas.
 - A categoria em uma despesa é opcional: uma despesa pode existir sem categoria.
-- Valores monetários são registrados em uma única moeda padrão; conversão entre moedas está fora de escopo nesta versão.
+- Valores monetários são registrados e exibidos em Real brasileiro (BRL), com formatação no locale pt-BR (ex.: `R$ 1.234,56`); conversão entre moedas está fora de escopo nesta versão.
 - Relatórios exportáveis, orçamentos, receitas/entradas e despesas recorrentes estão fora de escopo nesta versão, que trata apenas de despesas avulsas.
-- A dashboard apresenta a situação financeira consolidada do usuário; filtros avançados por período são desejáveis, mas não obrigatórios para a primeira versão.
+- A dashboard apresenta a situação financeira consolidada do usuário considerando todo o histórico de despesas (sem recorte de período); filtros avançados por período estão fora de escopo nesta versão.
 - Suporte a múltiplos idiomas está fora de escopo; a interface é apresentada em português.
