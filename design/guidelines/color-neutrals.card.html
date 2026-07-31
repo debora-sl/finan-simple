@@ -1,0 +1,29 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Escala neutra (Slate)" subtitle="Fundos, bordas e texto" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 18px; background: var(--bg-app); font-family: var(--font-sans); }
+  .scale { display: flex; gap: 0; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-xs); }
+  .step { flex: 1; height: 64px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; font-size: 11px; font-weight: 600; }
+  .lbl { margin-top: 10px; font-size: 12px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+  <div class="scale">
+    <div class="step" style="background:#F8FAFC;color:#475569">50</div>
+    <div class="step" style="background:#F1F5F9;color:#475569">100</div>
+    <div class="step" style="background:#E2E8F0;color:#475569">200</div>
+    <div class="step" style="background:#CBD5E1;color:#334155">300</div>
+    <div class="step" style="background:#94A3B8;color:#fff">400</div>
+    <div class="step" style="background:#64748B;color:#fff">500</div>
+    <div class="step" style="background:#475569;color:#fff">600</div>
+    <div class="step" style="background:#334155;color:#fff">700</div>
+    <div class="step" style="background:#1E293B;color:#fff">800</div>
+    <div class="step" style="background:#0F172A;color:#fff">900</div>
+  </div>
+  <div class="lbl">Fundo #F8FAFC · Texto principal #0F172A · Texto secundário #64748B</div>
+</body>
+</html>

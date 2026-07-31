@@ -1,0 +1,28 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Cores das categorias" subtitle="Paleta fixa para os 9 grupos de gastos" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 18px; background: var(--bg-app); font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .cat { display: flex; align-items: center; gap: 8px; }
+  .dot { width: 22px; height: 22px; border-radius: var(--radius-sm); flex-shrink: 0; }
+  .t { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="cat"><span class="dot" style="background:var(--cat-moradia)"></span><span class="t">Moradia</span></div>
+    <div class="cat"><span class="dot" style="background:var(--cat-mercado)"></span><span class="t">Mercado</span></div>
+    <div class="cat"><span class="dot" style="background:var(--cat-transporte)"></span><span class="t">Transporte</span></div>
+    <div class="cat"><span class="dot" style="background:var(--cat-saude)"></span><span class="t">Saúde</span></div>
+    <div class="cat"><span class="dot" style="background:var(--cat-educacao)"></span><span class="t">Educação</span></div>
+    <div class="cat"><span class="dot" style="background:var(--cat-lazer)"></span><span class="t">Lazer</span></div>
+    <div class="cat"><span class="dot" style="background:var(--cat-cartao)"></span><span class="t">Cartão</span></div>
+    <div class="cat"><span class="dot" style="background:var(--cat-fixas)"></span><span class="t">Contas fixas</span></div>
+    <div class="cat"><span class="dot" style="background:var(--cat-outros)"></span><span class="t">Outros</span></div>
+  </div>
+</body>
+</html>

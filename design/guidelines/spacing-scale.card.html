@@ -1,0 +1,26 @@
+<!-- @dsCard group="Spacing" viewport="700x150" name="Grade de espaçamento" subtitle="Base 4px · tokens --space-1 a --space-12" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 20px 24px; background: var(--surface-card); font-family: var(--font-sans); }
+  .row { display: flex; align-items: flex-end; gap: 16px; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .bar { background: var(--action-soft); border: 1px solid var(--action); border-radius: var(--radius-xs); }
+  .lbl { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item"><div class="bar" style="width:4px;height:4px"></div><div class="lbl">1 · 4</div></div>
+    <div class="item"><div class="bar" style="width:8px;height:8px"></div><div class="lbl">2 · 8</div></div>
+    <div class="item"><div class="bar" style="width:12px;height:12px"></div><div class="lbl">3 · 12</div></div>
+    <div class="item"><div class="bar" style="width:16px;height:16px"></div><div class="lbl">4 · 16</div></div>
+    <div class="item"><div class="bar" style="width:24px;height:24px"></div><div class="lbl">6 · 24</div></div>
+    <div class="item"><div class="bar" style="width:32px;height:32px"></div><div class="lbl">8 · 32</div></div>
+    <div class="item"><div class="bar" style="width:48px;height:48px"></div><div class="lbl">12 · 48</div></div>
+  </div>
+</body>
+</html>

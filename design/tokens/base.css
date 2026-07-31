@@ -1,0 +1,21 @@
+/* ============================================================
+   BASE — minimal resets & body defaults
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Money figures everywhere use tabular numerals */
+.cf-money { font-variant-numeric: tabular-nums; letter-spacing: var(--tracking-snug); }
+
+::selection { background: var(--blue-100); color: var(--slate-900); }

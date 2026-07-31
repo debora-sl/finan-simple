@@ -1,0 +1,141 @@
+/* ============================================================
+   COLORS — Controle Financeiro Residencial
+   Base palette + semantic aliases. Light is default; the
+   [data-theme="dark"] scope overrides the semantic layer only.
+   ============================================================ */
+
+:root {
+  /* --- Base neutrals (Slate) --- */
+  --slate-50:  #F8FAFC;
+  --slate-100: #F1F5F9;
+  --slate-200: #E2E8F0;
+  --slate-300: #CBD5E1;
+  --slate-400: #94A3B8;
+  --slate-500: #64748B;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1E293B;
+  --slate-900: #0F172A;
+  --slate-950: #020617;
+  --white:     #FFFFFF;
+
+  /* --- Brand / action (Blue) --- */
+  --blue-50:  #EFF6FF;
+  --blue-100: #DBEAFE;
+  --blue-200: #BFDBFE;
+  --blue-500: #3B82F6;
+  --blue-600: #2563EB;
+  --blue-700: #1D4ED8;
+
+  /* --- Positive / income (Green) --- */
+  --green-50:  #F0FDF4;
+  --green-100: #DCFCE7;
+  --green-500: #22C55E;
+  --green-600: #16A34A;
+  --green-700: #15803D;
+
+  /* --- Negative / expense (Red) --- */
+  --red-50:  #FEF2F2;
+  --red-100: #FEE2E2;
+  --red-500: #EF4444;
+  --red-600: #DC2626;
+  --red-700: #B91C1C;
+
+  /* --- Warning / due soon (Amber) --- */
+  --amber-50:  #FFFBEB;
+  --amber-100: #FEF3C7;
+  --amber-500: #F59E0B;
+  --amber-600: #D97706;
+  --amber-700: #B45309;
+
+  /* --- Category accents (used in charts/tags) --- */
+  --cat-moradia:    #2563EB; /* Moradia */
+  --cat-mercado:    #16A34A; /* Mercado */
+  --cat-transporte: #F59E0B; /* Transporte */
+  --cat-saude:      #EF4444; /* Saúde */
+  --cat-educacao:   #8B5CF6; /* Educação */
+  --cat-lazer:      #EC4899; /* Lazer */
+  --cat-cartao:     #0EA5E9; /* Cartão de crédito */
+  --cat-fixas:      #14B8A6; /* Contas fixas */
+  --cat-outros:     #64748B; /* Outros */
+
+  /* ============================================================
+     SEMANTIC ALIASES — LIGHT (default)
+     ============================================================ */
+  --bg-app:        var(--slate-50);
+  --bg-subtle:     var(--slate-100);
+  --surface-card:  var(--white);
+  --surface-raised:var(--white);
+  --surface-sunken:var(--slate-50);
+  --surface-hover: var(--slate-100);
+
+  --border-subtle: var(--slate-200);
+  --border-strong: var(--slate-300);
+  --border-focus:  var(--blue-600);
+
+  --text-primary:   var(--slate-900);
+  --text-secondary: var(--slate-500);
+  --text-tertiary:  var(--slate-400);
+  --text-on-accent: var(--white);
+  --text-link:      var(--blue-600);
+
+  /* Action (primary buttons, links, active nav) */
+  --action:        var(--blue-600);
+  --action-hover:  var(--blue-700);
+  --action-soft:   var(--blue-50);
+  --action-soft-fg:var(--blue-700);
+
+  /* Positive */
+  --positive:      var(--green-600);
+  --positive-fg:   var(--green-700);
+  --positive-soft: var(--green-50);
+
+  /* Negative */
+  --negative:      var(--red-600);
+  --negative-fg:   var(--red-700);
+  --negative-soft: var(--red-50);
+
+  /* Warning */
+  --warning:       var(--amber-500);
+  --warning-fg:    var(--amber-700);
+  --warning-soft:  var(--amber-50);
+}
+
+/* ============================================================
+   SEMANTIC ALIASES — DARK
+   ============================================================ */
+[data-theme="dark"] {
+  --bg-app:        var(--slate-950);
+  --bg-subtle:     var(--slate-900);
+  --surface-card:  var(--slate-900);
+  --surface-raised:var(--slate-800);
+  --surface-sunken:var(--slate-950);
+  --surface-hover: var(--slate-800);
+
+  --border-subtle: var(--slate-800);
+  --border-strong: var(--slate-700);
+  --border-focus:  var(--blue-500);
+
+  --text-primary:   var(--slate-100);
+  --text-secondary: var(--slate-400);
+  --text-tertiary:  var(--slate-500);
+  --text-on-accent: var(--white);
+  --text-link:      var(--blue-200);
+
+  --action:        var(--blue-500);
+  --action-hover:  var(--blue-600);
+  --action-soft:   rgba(37, 99, 235, 0.16);
+  --action-soft-fg:var(--blue-200);
+
+  --positive:      var(--green-500);
+  --positive-fg:   #4ADE80;
+  --positive-soft: rgba(34, 197, 94, 0.14);
+
+  --negative:      var(--red-500);
+  --negative-fg:   #F87171;
+  --negative-soft: rgba(239, 68, 68, 0.15);
+
+  --warning:       var(--amber-500);
+  --warning-fg:    #FBBF24;
+  --warning-soft:  rgba(245, 158, 11, 0.15);
+}

@@ -1,0 +1,86 @@
+<!-- @dsCard group="Dashboard" viewport="1280x860" name="Painel — Visão geral" subtitle="Dashboard web completo: resumo, contas, movimentações e gráfico" -->
+<!-- @startingPoint section="Dashboard" subtitle="Painel financeiro residencial (desktop)" viewport="1280x860" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Controle Financeiro — Painel</title>
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg-app); }
+  #root { height: 100vh; }
+  .cf-shell { display: flex; height: 100vh; overflow: hidden; }
+  .cf-main { flex: 1; min-width: 0; height: 100%; overflow-y: auto; }
+  .cf-sidebar-wrap { height: 100%; }
+  @media (max-width: 880px) {
+    .cf-sidebar-wrap { position: fixed; inset: 0 auto 0 0; z-index: 50; transform: translateX(-100%); transition: transform .25s var(--ease-out); box-shadow: var(--shadow-xl); }
+    .cf-sidebar-wrap.open { transform: translateX(0); }
+    .cf-menu-btn { display: inline-flex !important; }
+    .cf-scrim { position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 40; }
+    .cf-cols { grid-template-columns: 1fr !important; }
+  }
+</style>
+</head>
+<body>
+  <template id="__bundler_thumbnail" data-bg-color="#2563EB">
+    <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1200" height="800" fill="#2563EB"/>
+      <rect x="470" y="300" width="260" height="200" rx="40" fill="#fff"/>
+      <circle cx="700" cy="360" r="14" fill="#2563EB"/>
+      <path d="M520 300a120 120 0 0 1 180 0" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round"/>
+      <rect x="540" y="500" width="40" height="60" rx="10" fill="#fff"/>
+      <rect x="620" y="500" width="40" height="60" rx="10" fill="#fff"/>
+    </svg>
+  </template>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="../../_ds_bundle.js"></script>
+  <script src="../icons.js"></script>
+  <script src="./data.js"></script>
+  <script type="text/babel" src="./Sidebar.jsx"></script>
+  <script type="text/babel" src="./Topbar.jsx"></script>
+  <script type="text/babel" src="./AddTransactionModal.jsx"></script>
+  <script type="text/babel" src="./DashboardScreen.jsx"></script>
+  <script type="text/babel">
+    function App() {
+      const [theme, setTheme] = React.useState('light');
+      const [nav, setNav] = React.useState('home');
+      const [month, setMonth] = React.useState(5);
+      const [category, setCategory] = React.useState('all');
+      const [modal, setModal] = React.useState(false);
+      const [drawer, setDrawer] = React.useState(false);
+
+      React.useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
+
+      const titles = {
+        home: ['Visão geral', 'Resumo financeiro da casa em junho'],
+        transactions: ['Movimentações', 'Todas as entradas e saídas do mês'],
+        bills: ['Contas a pagar', 'Próximos vencimentos e faturas'],
+        reports: ['Relatórios', 'Análise de gastos por categoria'],
+        goals: ['Metas', 'Acompanhe seus objetivos de economia'],
+      };
+      const [title, subtitle] = titles[nav] || titles.home;
+
+      return (
+        <div className="cf-shell">
+          <div className={'cf-sidebar-wrap' + (drawer ? ' open' : '')}>
+            <Sidebar active={nav} onNavigate={(k) => { setNav(k); setDrawer(false); }} theme={theme} onToggleTheme={() => setTheme((t) => t === 'dark' ? 'light' : 'dark')} />
+          </div>
+          {drawer && <div className="cf-scrim" onClick={() => setDrawer(false)} />}
+          <div className="cf-main">
+            <Topbar title={title} subtitle={subtitle} month={month} onMonth={setMonth}
+              category={category} onCategory={setCategory} onAdd={() => setModal(true)} onMenu={() => setDrawer(true)} />
+            <DashboardScreen onAdd={() => setModal(true)} category={category} />
+          </div>
+          <AddTransactionModal open={modal} onClose={() => setModal(false)} onSave={() => setModal(false)} />
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

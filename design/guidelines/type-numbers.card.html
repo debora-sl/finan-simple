@@ -1,0 +1,31 @@
+<!-- @dsCard group="Type" viewport="700x160" name="Pesos & números" subtitle="Inter 400–700 · algarismos tabulares para dinheiro" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 20px 24px; background: var(--surface-card); font-family: var(--font-sans); color: var(--text-primary); }
+  .weights { display: flex; gap: 28px; margin-bottom: 18px; }
+  .w b { display: block; font-size: 22px; }
+  .w span { font-size: 11px; color: var(--text-tertiary); font-weight: 600; }
+  .money { display: flex; gap: 28px; align-items: baseline; }
+  .money .v { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .pos { color: var(--positive-fg); }
+  .neg { color: var(--negative-fg); }
+  .cap { font-size: 11px; color: var(--text-tertiary); font-weight: 600; margin-top: 4px; }
+</style>
+</head>
+<body>
+  <div class="weights">
+    <div class="w"><b style="font-weight:400">Aa</b><span>Regular 400</span></div>
+    <div class="w"><b style="font-weight:500">Aa</b><span>Medium 500</span></div>
+    <div class="w"><b style="font-weight:600">Aa</b><span>Semibold 600</span></div>
+    <div class="w"><b style="font-weight:700">Aa</b><span>Bold 700</span></div>
+  </div>
+  <div class="money">
+    <div><div class="v pos">+ R$ 6.500,00</div><div class="cap">RECEITA · TABULAR-NUMS</div></div>
+    <div><div class="v neg">− R$ 3.120,00</div><div class="cap">DESPESA · TABULAR-NUMS</div></div>
+  </div>
+</body>
+</html>

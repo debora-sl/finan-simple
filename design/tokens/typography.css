@@ -1,0 +1,50 @@
+/* ============================================================
+   TYPOGRAPHY — Inter
+   Scale: Display 40–48 / H1 32 / H2 24 / H3 20 / Body 16 /
+   Small 14 / Caption 12. Numbers use tabular figures.
+   ============================================================ */
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Font sizes */
+  --text-display: 44px;
+  --text-h1:      32px;
+  --text-h2:      24px;
+  --text-h3:      20px;
+  --text-body:    16px;
+  --text-sm:      14px;
+  --text-caption: 12px;
+
+  /* Line heights */
+  --leading-tight:   1.15;
+  --leading-snug:    1.3;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.65;
+
+  /* Weights */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Letter spacing */
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+
+  /* Tabular numerals for money figures */
+  --num-tabular: "tnum" 1, "lnum" 1; /* @kind other */
+}
+
+/* Optional helper classes — components mostly use vars directly. */
+.cf-display { font: var(--weight-bold) var(--text-display)/var(--leading-tight) var(--font-sans); letter-spacing: var(--tracking-tight); }
+.cf-h1 { font: var(--weight-bold) var(--text-h1)/var(--leading-tight) var(--font-sans); letter-spacing: var(--tracking-tight); }
+.cf-h2 { font: var(--weight-semibold) var(--text-h2)/var(--leading-snug) var(--font-sans); letter-spacing: var(--tracking-snug); }
+.cf-h3 { font: var(--weight-semibold) var(--text-h3)/var(--leading-snug) var(--font-sans); }
+.cf-body { font: var(--weight-regular) var(--text-body)/var(--leading-normal) var(--font-sans); }
+.cf-sm { font: var(--weight-regular) var(--text-sm)/var(--leading-normal) var(--font-sans); }
+.cf-caption { font: var(--weight-medium) var(--text-caption)/var(--leading-normal) var(--font-sans); }
+.cf-num { font-family: var(--font-sans); font-feature-settings: var(--num-tabular); font-variant-numeric: tabular-nums; }
