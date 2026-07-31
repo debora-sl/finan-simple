@@ -33,7 +33,7 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 **Purpose**: Inicialização do projeto — dependências e shadcn/ui ainda não existem (`app/` só tem `layout.tsx`, `page.tsx`, `globals.css`).
 
 - [ ] T001 Instalar dependências via pnpm: `better-auth`, `prisma` (dev) + `@prisma/client`, `next-safe-action`, `zod`, `react-hook-form`, `@hookform/resolvers`, `lucide-react`, `recharts` (para o `chart` do shadcn)
-- [ ] T002 [P] Inicializar shadcn/ui (`pnpm dlx shadcn@latest init`) e gerar os componentes: `button`, `input`, `label`, `form`, `card`, `table`, `select`, `sheet`, `dialog`, `switch`, `badge`, `sonner`, `chart` — confirmar que consomem os tokens já existentes em `app/globals.css` (não sobrescrever)
+- [ ] T002 [P] Inicializar shadcn/ui (`pnpm dlx shadcn@latest init`) e gerar os componentes: `button`, `input`, `label`, `form`, `card`, `table`, `select`, `sheet`, `dialog`, `switch`, `badge`, `sonner`, `chart`, `progress` (base do `CategoryBar` — ver mapeamento DS→shadcn no `plan.md`) — confirmar que consomem os tokens já existentes em `app/globals.css` (não sobrescrever)
 - [ ] T003 [P] Criar `.env` e `.env.example` com `DATABASE_URL="file:./dev.db"`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL="http://localhost:3000"`
 
 ---
@@ -44,7 +44,7 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 **⚠️ CRITICAL**: Nenhuma user story pode começar antes desta fase estar completa.
 
-- [ ] T004 Criar `prisma/schema.prisma` (provider `sqlite`) com os modelos `User`, `Category`, `Session`, `Account`, `Verification` conforme `data-model.md` (campos, `@unique`, índices `(userId, name)` em Category)
+- [ ] T004 Criar `prisma/schema.prisma` (provider `sqlite`) com os modelos `User`, `Category`, `Session`, `Account`, `Verification` conforme `data-model.md` (campos, `@unique`). Em `Category`, incluir a coluna derivada `nameLower` e o índice único composto `@@unique([userId, nameLower])` que garante a unicidade **case-insensitive** de nome por usuário exigida por FR-011 (índice sobre `name` seria case-sensitive no SQLite)
 - [ ] T004a Adicionar modelo `Expense` a `prisma/schema.prisma` (`amountInCents Int`, `categoryId` opcional com `onDelete: SetNull`, `userId` com `onDelete: Cascade`, índices `(userId, date)` e `(userId, categoryId)`) — depende de T004
 - [ ] T005 Rodar `pnpm prisma generate` e `pnpm prisma migrate dev --name init` — depende de T004a
 - [ ] T006 [P] Criar `lib/prisma.ts` (singleton do `PrismaClient`, padrão global em dev) — depende de T005
@@ -55,7 +55,7 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 - [ ] T011 Criar `lib/action-client.ts` (`actionClient` base + `protectedActionClient` com middleware que injeta `ctx.user` a partir de `verifySession()`/`getCurrentUser()`, lançando erro sem sessão) — depende de T010
 - [ ] T012 Criar `proxy.ts` na raiz do projeto (checagem otimista por cookie: `(app)` sem cookie → `/login`; `/login`/`/signup` com cookie → `/dashboard`; `matcher` excluindo `api`, `_next/static`, `_next/image`) — depende de T007
 - [ ] T013 [P] Criar `lib/money.ts` (`amountToCents`/`centsToAmount`, formatação BRL via `Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" })`) — sem dependências
-- [ ] T014 Verificar `app/layout.tsx` (footer já renderizado? não duplicar) e adicionar `<Toaster />` (shadcn `sonner`) ao root layout para feedback de erro/sucesso das Server Actions — depende de T002
+- [ ] T014 Verificar `app/layout.tsx` (footer já renderizado? não duplicar) e adicionar `<Toaster />` (shadcn `sonner`) ao root layout. Estabelecer o **padrão único de superfície de erro/validação (FR-018)**: todo componente que consome uma action via `useAction` trata `onError`/`serverError`/`validationErrors` exibindo `toast.error` com a mensagem retornada, e `onSuccess` com feedback de sucesso — erros de campo específicos permanecem inline no `Form`. Esse padrão é referência obrigatória para T028/T029, T036/T037, T041 — depende de T002
 
 **Checkpoint**: Fundação pronta — autenticação, acesso a dados e Server Actions protegidas disponíveis para todas as user stories.
 
@@ -99,8 +99,8 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 - [ ] T025 [US2] Criar `actions/create-expense.ts` (`protectedActionClient`, `.inputSchema`, converte `amount`→`amountInCents` via `lib/money.ts`, valida posse de `categoryId` se informado, `isPaid = false`) — depende de T011, T023, T024
 - [ ] T026 [US2] Criar `actions/update-expense.ts` (mesma validação de posse da despesa e da categoria) — depende de T025
 - [ ] T027 [US2] Criar `actions/delete-expense.ts` (remove só se `expense.userId === ctx.user.id`) — depende de T025
-- [ ] T028 [P] [US2] Criar `components/expenses/expense-form.tsx` (client; `Sheet`/`Dialog` do shadcn — não recriar botão de fechar do `Sheet`; `Form` + `react-hook-form`; `useAction` para create/update; referência `design/ui_kits/dashboard/AddTransactionModal.jsx`)
-- [ ] T029 [P] [US2] Criar `components/expenses/expense-table.tsx` (shadcn `Table`; referência `design/components/finance/TransactionRow.prompt.md`; ações de editar/remover via `useAction`)
+- [ ] T028 [P] [US2] Criar `components/expenses/expense-form.tsx` (client; `Sheet`/`Dialog` do shadcn — não recriar botão de fechar do `Sheet`; `Form` + `react-hook-form`; `useAction` para create/update com o padrão de erro/sucesso de T014 — FR-018; referência `design/ui_kits/dashboard/AddTransactionModal.jsx`)
+- [ ] T029 [P] [US2] Criar `components/expenses/expense-table.tsx` (shadcn `Table`; referência `design/components/finance/TransactionRow.prompt.md`; ações de editar/remover via `useAction` com o padrão de erro/sucesso de T014 — FR-018)
 - [ ] T030 [US2] Criar `app/(app)/expenses/page.tsx` (Server Component; busca `getExpenses` via DAL; renderiza `ExpenseTable` + gatilho do `ExpenseForm`; referência `design/ui_kits/dashboard/DashboardScreen.jsx`) — depende de T024, T028, T029
 
 **Checkpoint**: US1 + US2 funcionam de forma independente (despesas sem categoria ainda são suportadas; seletor de categoria populado em US3).
@@ -119,10 +119,10 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 - [ ] T031 [P] [US3] Criar `lib/validation/category.ts` (Zod: `name` trim/min1/max60)
 - [ ] T032 [P] [US3] Criar `data/categories.ts` (`getCategories(userId)` ordenado por `name`; `getCategoryById(userId, id)`) — depende de T006
-- [ ] T033 [US3] Criar `actions/create-category.ts` (índice único `(userId, name)` case-insensitive; erro claro em duplicidade — FR-011) — depende de T011, T031, T032
-- [ ] T034 [US3] Criar `actions/update-category.ts` (mesma checagem de posse e duplicidade) — depende de T033
+- [ ] T033 [US3] Criar `actions/create-category.ts` (deriva `nameLower = name.trim().toLowerCase()` e persiste; unicidade case-insensitive garantida por `@@unique([userId, nameLower])`; captura `P2002` do Prisma e retorna erro claro de nome duplicado — FR-011, FR-018) — depende de T011, T031, T032
+- [ ] T034 [US3] Criar `actions/update-category.ts` (mesma checagem de posse; recalcula `nameLower` ao renomear; mesma captura de duplicidade `P2002` com erro claro — FR-011, FR-018) — depende de T033
 - [ ] T035 [US3] Criar `actions/delete-category.ts` (remove; despesas associadas ficam com `categoryId = null` via `onDelete: SetNull` — FR-014) — depende de T033
-- [ ] T036 [P] [US3] Criar `components/categories/category-form.tsx` (client; `Dialog`/`Form` shadcn; `useAction`)
+- [ ] T036 [P] [US3] Criar `components/categories/category-form.tsx` (client; `Dialog`/`Form` shadcn; `useAction` com o padrão de erro/sucesso de T014, incluindo a mensagem de nome duplicado de T033/T034 — FR-011, FR-018)
 - [ ] T037 [P] [US3] Criar `components/categories/category-list.tsx` (referência `design/components/finance/CategoryBar.prompt.md` e `CategoryIcon.prompt.md`)
 - [ ] T038 [US3] Criar `app/(app)/categories/page.tsx` (Server Component; busca `getCategories`; renderiza `CategoryList` + `CategoryForm`) — depende de T032, T036, T037
 - [ ] T039 [US3] Integrar `Select` de categoria (shadcn, referência `design/components/core/Select.prompt.md`) em `components/expenses/expense-form.tsx`, populado por `getCategories` — depende de T028, T032
@@ -142,7 +142,7 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 ### Implementation for User Story 4
 
 - [ ] T040 [US4] Criar `actions/toggle-expense-paid.ts` (`inputSchema { id, isPaid }`; altera só se a despesa pertence a `ctx.user.id`) — depende de T011, T024
-- [ ] T041 [US4] Atualizar `components/expenses/expense-table.tsx` com `Switch`/`Badge` do shadcn para alternar e exibir pago/pendente via `useAction(toggleExpensePaid)` — depende de T029, T040
+- [ ] T041 [US4] Atualizar `components/expenses/expense-table.tsx` com `Switch`/`Badge` do shadcn para alternar e exibir pago/pendente via `useAction(toggleExpensePaid)`, seguindo o padrão de erro/sucesso de T014 — FR-018 — depende de T029, T040
 
 **Checkpoint**: US1–US4 funcionam de forma independente.
 
@@ -173,7 +173,7 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 - [ ] T046 [P] Rodar `pnpm lint` e corrigir todos os erros (Constituição, Princípio IV)
 - [ ] T047 Rodar `pnpm build` e corrigir erros de tipo/compilação
-- [ ] T048 Validar manualmente todos os cenários de `quickstart.md` (US1–US5), incluindo o teste de isolamento entre duas contas (SC-003/SC-004)
+- [ ] T048 Validar manualmente todos os cenários de `quickstart.md` (US1–US5), incluindo o teste de isolamento entre duas contas (SC-003/SC-004) e a superfície de erro/validação em ações recusadas — e-mail duplicado, valor inválido, nome de categoria duplicado (case-insensitive) — exibindo mensagem clara ao usuário (FR-018)
 - [ ] T049 [P] Conferir que `design/` não é importado por nenhum arquivo em `app/` ou `components/` (checagem de grep) e que nenhuma cor hard-coded foi introduzida fora dos tokens de `app/globals.css`
 
 ---

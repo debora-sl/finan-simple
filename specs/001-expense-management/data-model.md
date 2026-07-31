@@ -54,7 +54,8 @@ Rótulo de organização de despesas criado por um usuário.
 | Campo | Tipo | Regras |
 |-------|------|--------|
 | `id` | String (cuid) | PK |
-| `name` | String | Obrigatório; mín. 1 caractere; trim (FR-011) |
+| `name` | String | Obrigatório; mín. 1 caractere; trim (FR-011); valor exibido ao usuário |
+| `nameLower` | String | Derivado de `name.trim().toLowerCase()`; usado só para unicidade case-insensitive (FR-011) |
 | `userId` | String | FK → `User.id`; `onDelete: Cascade` |
 | `createdAt` | DateTime | Default `now()` |
 | `updatedAt` | DateTime | `@updatedAt` |
@@ -63,7 +64,8 @@ Relações: `user User`, `expenses Expense[]`.
 
 Regras de negócio:
 - Toda consulta/edição/remoção filtra por `userId` do usuário autenticado (FR-006, FR-012).
-- Recomendado índice único composto `(userId, name)` para evitar categorias duplicadas por usuário (nomes iguais entre usuários diferentes são permitidos).
+- Unicidade **case-insensitive** por usuário (FR-011) é garantida no banco por índice único composto `@@unique([userId, nameLower])`. O índice sobre `name` seria case-sensitive no SQLite; por isso persiste-se a coluna derivada `nameLower` (calculada na action a partir de `name.trim().toLowerCase()`) e a unicidade recai sobre ela. Nomes iguais entre usuários diferentes continuam permitidos.
+- A action captura a violação do índice único (`P2002` do Prisma) e retorna erro claro de nome duplicado (FR-011, FR-018).
 
 ### Expense
 
@@ -173,7 +175,7 @@ Guarda a credencial (hash de senha para o provedor e-mail/senha) e/ou vínculos 
 | FR-005/006 | Filtro por `userId` em todas as queries de `data/`; DAL |
 | FR-007/008 | `Expense.description/amountInCents/date`; `amountInCents > 0` |
 | FR-009/010 | Queries e actions de Expense filtradas por `userId` |
-| FR-011/012 | `Category` + actions filtradas por `userId` |
+| FR-011/012 | `Category` + actions filtradas por `userId`; unicidade case-insensitive via `@@unique([userId, nameLower])` |
 | FR-013 | `Expense.categoryId` opcional, validado por posse |
 | FR-014 | `onDelete: SetNull` em `Expense.categoryId` |
 | FR-015 | `Expense.isPaid` + `toggle-expense-paid` |
