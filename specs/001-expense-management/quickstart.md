@@ -35,6 +35,9 @@ pnpm build     # DEVE compilar sem erros de tipo
 ## Cenários de validação (mapeados ao spec)
 
 ### US1 — Autenticação (P1)
+
+> Referência visual: o DS não tem telas de login/cadastro dedicadas; montar os formulários com os primitivos de `design/components/core/` (`Input.prompt.md`, `Button.prompt.md`, `Card.prompt.md`), reconstruídos com shadcn/ui.
+
 1. Cadastrar com nome, e-mail válido e senha → acesso à área autenticada (US1.1).
 2. Sair e entrar novamente com as mesmas credenciais → sucesso (US1.2).
 3. Cadastrar com e-mail já usado → recusa com mensagem clara (US1.3).
@@ -43,23 +46,35 @@ pnpm build     # DEVE compilar sem erros de tipo
 6. Acessar `/dashboard` ou `/expenses` sem sessão → redirecionado a `/login` (SC-004; edge case de acesso não autenticado).
 
 ### US2 — Despesas (P1)
+
+> Referência visual: lista de despesas → `design/components/finance/TransactionRow.prompt.md`; formulário de criação/edição → `design/ui_kits/dashboard/AddTransactionModal.jsx` e `design/components/finance/BillItem.prompt.md`; layout da tela → `design/ui_kits/dashboard/DashboardScreen.jsx` (seção de transações).
+
 1. Criar despesa com descrição, valor e data válidos → aparece na lista (US2.1).
 2. Salvar despesa com valor ausente/≤0 → recusada com mensagem de correção (US2.2; FR-008).
 3. Conferir que a lista mostra apenas despesas do próprio usuário (US2.3; SC-003).
 4. Editar e remover uma despesa → mudança refletida na lista (US2.4).
 
 ### US3 — Categorias (P2)
+
+> Referência visual: seletor/lista de categorias → `design/components/finance/CategoryBar.prompt.md` e `design/components/finance/CategoryIcon.prompt.md` (mapa fixo das 9 categorias); seleção em formulário → `design/components/core/Select.prompt.md`.
+
 1. Criar categoria com nome → disponível para associação (US3.1).
 2. Associar categoria a uma despesa na criação/edição (US3.2).
 3. Listar categorias → apenas as do usuário (US3.3).
 4. Remover categoria associada a despesas → despesas permanecem sem categoria (US3.4; FR-014).
 
 ### US4 — Marcar como paga (P2)
+
+> Referência visual: toggle de status em `design/components/finance/TransactionRow.prompt.md` (ação de marcar pago/pendente) e `design/components/core/Switch.prompt.md`; distinção visual pago/pendente via `design/components/core/Badge.prompt.md`.
+
 1. Marcar despesa não paga como paga → consta como paga (US4.1).
 2. Marcar de volta como não paga → volta a pendente (US4.2).
 3. Lista distingue claramente pagas de pendentes (US4.3).
 
 ### US5 — Dashboard (P3)
+
+> Referência visual: layout geral → `design/ui_kits/dashboard/DashboardScreen.jsx`; cards de totais → `design/components/finance/SummaryCard.prompt.md`; distribuição por categoria → `design/components/finance/CategoryDonut.prompt.md` e `CategoryBar.prompt.md`; navegação → `design/ui_kits/dashboard/Sidebar.jsx` e `Topbar.jsx`.
+
 1. Com despesas: ver total e divisão pago/pendente corretos (US5.1; SC-005).
 2. Com várias categorias: ver gastos agrupados por categoria (US5.2).
 3. Sem nenhuma despesa: ver estado vazio informativo (US5.3; FR-017).

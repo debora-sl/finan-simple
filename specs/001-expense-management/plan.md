@@ -125,6 +125,26 @@ proxy.ts                            # Redirecionamento otimista (Next.js 16; ex-
 
 **Structure Decision**: Aplicação única com App Router (não há separação backend/frontend). Route groups `(auth)` e `(app)` separam área pública da autenticada, cada uma com seu `layout.tsx`. A arquitetura reflete diretamente a Constituição: `data/` isola o Prisma (Princípio II), `actions/` concentra mutações seguras (Princípio III), `components/ui/` recebe os componentes do shadcn (Princípio I), e `lib/dal.ts` centraliza a verificação de sessão. O arquivo de redirecionamento no root chama-se `proxy.ts` (renomeação do middleware no Next.js 16) e faz apenas checagens otimistas por cookie — a autorização real acontece na DAL e nas actions.
 
+## Design System / UI
+
+**Fonte de verdade visual**: `design/` (Design System Controle Financeiro). É referência, não código de produção — nada em `app/` ou `components/` importa de `design/`. Detalhe completo da política em [`design/USO-NO-PROJETO.md`](../../design/USO-NO-PROJETO.md).
+
+- **Tokens**: já portados para `app/globals.css` (Tailwind v4 `@theme`, contrato de variáveis do shadcn/ui mapeado para a camada semântica do DS, dark mode via `data-theme="dark"`). Toda tela/componente consome exclusivamente esses tokens; nenhuma cor hard-coded.
+- **Telas de referência (layout)**: `design/ui_kits/dashboard/DashboardScreen.jsx` (dashboard desktop), `design/ui_kits/dashboard/Sidebar.jsx` e `Topbar.jsx` (navegação do layout autenticado), `design/ui_kits/dashboard/AddTransactionModal.jsx` (formulário de despesa).
+- **Specs de componentes (não copiar `.jsx`; reconstruir com shadcn/ui a partir do `.prompt.md`)**: `design/components/finance/` (`SummaryCard`, `TransactionRow`, `BillItem`, `CategoryBar`, `CategoryDonut`, `CategoryIcon`) e `design/components/core/` (`Button`, `Input`, `Select`, `Switch`, `Badge`, `Card`, `IconButton`, `ProgressBar`, `SegmentedControl`).
+- **Escopo da feature 001**: usar apenas o que serve a dashboard, despesas, categorias e autenticação. Ignorar `design/ui_kits/mobile/` e `design/ui_kits/marketing/` (referência para o futuro).
+
+### Mapeamento DS → shadcn/ui
+
+| Componente do DS | Implementação |
+|---|---|
+| Button, Input, Select, Switch, Badge, Card | shadcn: `button`, `input`, `select`, `switch`, `badge`, `card` |
+| SegmentedControl | shadcn `tabs` ou `toggle-group` |
+| ProgressBar | shadcn `progress` |
+| SummaryCard, TransactionRow, BillItem, CategoryBar | componentes próprios em `components/`, compostos de primitivos shadcn |
+| CategoryDonut | shadcn `chart` (recharts) |
+| CategoryIcon | `lucide-react` + o mapa fixo das 9 categorias (`--cat-*`) |
+
 ## Complexity Tracking
 
 > Nenhuma violação de constituição a justificar. Seção não aplicável.
