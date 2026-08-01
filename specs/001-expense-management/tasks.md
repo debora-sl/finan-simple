@@ -158,10 +158,10 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 ### Implementation for User Story 5
 
-- [ ] T042 [P] [US5] Criar `data/dashboard.ts` (`getDashboardSummary(userId)`: `aggregate`/`groupBy` no Prisma sobre `amountInCents`, retorno `{ hasExpenses, totalInCents, paidInCents, pendingInCents, byCategory }` conforme `contracts/dashboard.md`, bucket "Sem categoria" para `categoryId = null`) — depende de T006
-- [ ] T043 [P] [US5] Criar `components/dashboard/summary-cards.tsx` (shadcn `Card`; referência `design/components/finance/SummaryCard.prompt.md`; formata valores via `lib/money.ts`)
-- [ ] T044 [P] [US5] Criar `components/dashboard/category-breakdown.tsx` (shadcn `chart`/recharts para donut + `CategoryBar`; referência `design/components/finance/CategoryDonut.prompt.md` e `CategoryBar.prompt.md`)
-- [ ] T045 [US5] Criar `app/(app)/dashboard/page.tsx` (Server Component; busca `getDashboardSummary`; estado vazio informativo quando `!hasExpenses` — FR-017; referência `design/ui_kits/dashboard/DashboardScreen.jsx`) — depende de T042, T043, T044
+- [X] T042 [P] [US5] Criar `data/dashboard.ts` (`getDashboardSummary(userId)`: `aggregate`/`groupBy` no Prisma sobre `amountInCents`, retorno `{ hasExpenses, totalInCents, paidInCents, pendingInCents, byCategory }` conforme `contracts/dashboard.md`, bucket "Sem categoria" para `categoryId = null`) — depende de T006
+- [X] T043 [P] [US5] Criar `components/dashboard/summary-cards.tsx` (shadcn `Card`; referência `design/components/finance/SummaryCard.prompt.md`; formata valores via `lib/money.ts`)
+- [X] T044 [P] [US5] Criar `components/dashboard/category-breakdown.tsx` (shadcn `chart`/recharts para donut + `CategoryBar`; referência `design/components/finance/CategoryDonut.prompt.md` e `CategoryBar.prompt.md`)
+- [X] T045 [US5] Criar `app/(app)/dashboard/page.tsx` (Server Component; busca `getDashboardSummary`; estado vazio informativo quando `!hasExpenses` — FR-017; referência `design/ui_kits/dashboard/DashboardScreen.jsx`) — depende de T042, T043, T044
 
 **Checkpoint**: Todas as user stories (US1–US5) funcionam de forma independente.
 
