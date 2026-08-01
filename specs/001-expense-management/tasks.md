@@ -94,14 +94,14 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Criar `lib/validation/expense.ts` (Zod: `description` min1/max200, `amount` positive/multipleOf(0.01), `date`, `categoryId` opcional) — depende de T013
-- [ ] T024 [P] [US2] Criar `data/expenses.ts` (`getExpenses(userId)` ordenado por `date` desc com `category` incluída; `getExpenseById(userId, id)`) — depende de T006
-- [ ] T025 [US2] Criar `actions/create-expense.ts` (`protectedActionClient`, `.inputSchema`, converte `amount`→`amountInCents` via `lib/money.ts`, valida posse de `categoryId` se informado, `isPaid = false`) — depende de T011, T023, T024
-- [ ] T026 [US2] Criar `actions/update-expense.ts` (mesma validação de posse da despesa e da categoria) — depende de T025
-- [ ] T027 [US2] Criar `actions/delete-expense.ts` (remove só se `expense.userId === ctx.user.id`) — depende de T025
-- [ ] T028 [P] [US2] Criar `components/expenses/expense-form.tsx` (client; `Sheet`/`Dialog` do shadcn — não recriar botão de fechar do `Sheet`; `Form` + `react-hook-form`; `useAction` para create/update com o padrão de erro/sucesso de T014 — FR-018; referência `design/ui_kits/dashboard/AddTransactionModal.jsx`)
-- [ ] T029 [P] [US2] Criar `components/expenses/expense-table.tsx` (shadcn `Table`; referência `design/components/finance/TransactionRow.prompt.md`; ações de editar/remover via `useAction` com o padrão de erro/sucesso de T014 — FR-018)
-- [ ] T030 [US2] Criar `app/(app)/expenses/page.tsx` (Server Component; busca `getExpenses` via DAL; renderiza `ExpenseTable` + gatilho do `ExpenseForm`; referência `design/ui_kits/dashboard/DashboardScreen.jsx`) — depende de T024, T028, T029
+- [X] T023 [P] [US2] Criar `lib/validation/expense.ts` (Zod: `description` min1/max200, `amount` positive/multipleOf(0.01), `date`, `categoryId` opcional) — depende de T013
+- [X] T024 [P] [US2] Criar `data/expenses.ts` (`getExpenses(userId)` ordenado por `date` desc com `category` incluída; `getExpenseById(userId, id)`) — depende de T006
+- [X] T025 [US2] Criar `actions/create-expense.ts` (`protectedActionClient`, `.inputSchema`, converte `amount`→`amountInCents` via `lib/money.ts`, valida posse de `categoryId` se informado, `isPaid = false`) — depende de T011, T023, T024
+- [X] T026 [US2] Criar `actions/update-expense.ts` (mesma validação de posse da despesa e da categoria) — depende de T025
+- [X] T027 [US2] Criar `actions/delete-expense.ts` (remove só se `expense.userId === ctx.user.id`) — depende de T025
+- [X] T028 [P] [US2] Criar `components/expenses/expense-form.tsx` (client; `Sheet`/`Dialog` do shadcn — não recriar botão de fechar do `Sheet`; `Form` + `react-hook-form`; `useAction` para create/update com o padrão de erro/sucesso de T014 — FR-018; referência `design/ui_kits/dashboard/AddTransactionModal.jsx`)
+- [X] T029 [P] [US2] Criar `components/expenses/expense-table.tsx` (shadcn `Table`; referência `design/components/finance/TransactionRow.prompt.md`; ações de editar/remover via `useAction` com o padrão de erro/sucesso de T014 — FR-018)
+- [X] T030 [US2] Criar `app/(app)/expenses/page.tsx` (Server Component; busca `getExpenses` via DAL; renderiza `ExpenseTable` + gatilho do `ExpenseForm`; referência `design/ui_kits/dashboard/DashboardScreen.jsx`) — depende de T024, T028, T029
 
 **Checkpoint**: US1 + US2 funcionam de forma independente (despesas sem categoria ainda são suportadas; seletor de categoria populado em US3).
 
