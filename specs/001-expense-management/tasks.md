@@ -48,14 +48,14 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 - [X] T004a Adicionar modelo `Expense` a `prisma/schema.prisma` (`amountInCents Int`, `categoryId` opcional com `onDelete: SetNull`, `userId` com `onDelete: Cascade`, índices `(userId, date)` e `(userId, categoryId)`) — depende de T004
 - [X] T005 Rodar `pnpm prisma generate` e `pnpm prisma migrate dev --name init` — depende de T004a
 - [X] T006 [P] Criar `lib/prisma.ts` (singleton do `PrismaClient`, padrão global em dev) — depende de T005
-- [ ] T007 Criar `lib/auth.ts` (`betterAuth` com `prismaAdapter(prisma, { provider: "sqlite" })` e `emailAndPassword: { enabled: true }`) — depende de T006
-- [ ] T008 [P] Criar `lib/auth-client.ts` (`createAuthClient` de `better-auth/react`, expondo `signIn`, `signUp`, `signOut`, `useSession`) — depende de T007
-- [ ] T009 Criar `app/api/auth/[...all]/route.ts` (exports `GET`/`POST` via `toNextJsHandler(auth)`) — depende de T007
-- [ ] T010 Criar `lib/dal.ts` (`verifySession()` com `cache` do React, redireciona a `/login` sem sessão; `getCurrentUser()` retornando DTO sem campos sensíveis) — depende de T007
-- [ ] T011 Criar `lib/action-client.ts` (`actionClient` base + `protectedActionClient` com middleware que injeta `ctx.user` a partir de `verifySession()`/`getCurrentUser()`, lançando erro sem sessão) — depende de T010
-- [ ] T012 Criar `proxy.ts` na raiz do projeto (checagem otimista por cookie: `(app)` sem cookie → `/login`; `/login`/`/signup` com cookie → `/dashboard`; `matcher` excluindo `api`, `_next/static`, `_next/image`) — depende de T007
+- [X] T007 Criar `lib/auth.ts` (`betterAuth` com `prismaAdapter(prisma, { provider: "sqlite" })` e `emailAndPassword: { enabled: true }`) — depende de T006
+- [X] T008 [P] Criar `lib/auth-client.ts` (`createAuthClient` de `better-auth/react`, expondo `signIn`, `signUp`, `signOut`, `useSession`) — depende de T007
+- [X] T009 Criar `app/api/auth/[...all]/route.ts` (exports `GET`/`POST` via `toNextJsHandler(auth)`) — depende de T007
+- [X] T010 Criar `lib/dal.ts` (`verifySession()` com `cache` do React, redireciona a `/login` sem sessão; `getCurrentUser()` retornando DTO sem campos sensíveis) — depende de T007
+- [X] T011 Criar `lib/action-client.ts` (`actionClient` base + `protectedActionClient` com middleware que injeta `ctx.user` a partir de `verifySession()`/`getCurrentUser()`, lançando erro sem sessão) — depende de T010
+- [X] T012 Criar `proxy.ts` na raiz do projeto (checagem otimista por cookie: `(app)` sem cookie → `/login`; `/login`/`/signup` com cookie → `/dashboard`; `matcher` excluindo `api`, `_next/static`, `_next/image`) — depende de T007
 - [X] T013 [P] Criar `lib/money.ts` (`amountToCents`/`centsToAmount`, formatação BRL via `Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" })`) — sem dependências
-- [ ] T014 Verificar `app/layout.tsx` (footer já renderizado? não duplicar) e adicionar `<Toaster />` (shadcn `sonner`) ao root layout. Estabelecer o **padrão único de superfície de erro/validação (FR-018)**: todo componente que consome uma action via `useAction` trata `onError`/`serverError`/`validationErrors` exibindo `toast.error` com a mensagem retornada, e `onSuccess` com feedback de sucesso — erros de campo específicos permanecem inline no `Form`. Esse padrão é referência obrigatória para T028/T029, T036/T037, T041 — depende de T002
+- [X] T014 Verificar `app/layout.tsx` (footer já renderizado? não duplicar) e adicionar `<Toaster />` (shadcn `sonner`) ao root layout. Estabelecer o **padrão único de superfície de erro/validação (FR-018)**: todo componente que consome uma action via `useAction` trata `onError`/`serverError`/`validationErrors` exibindo `toast.error` com a mensagem retornada, e `onSuccess` com feedback de sucesso — erros de campo específicos permanecem inline no `Form`. Esse padrão é referência obrigatória para T028/T029, T036/T037, T041 — depende de T002
 
 **Checkpoint**: Fundação pronta — autenticação, acesso a dados e Server Actions protegidas disponíveis para todas as user stories.
 
