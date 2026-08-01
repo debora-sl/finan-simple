@@ -141,8 +141,8 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 ### Implementation for User Story 4
 
-- [ ] T040 [US4] Criar `actions/toggle-expense-paid.ts` (`inputSchema { id, isPaid }`; altera só se a despesa pertence a `ctx.user.id`) — depende de T011, T024
-- [ ] T041 [US4] Atualizar `components/expenses/expense-table.tsx` com `Switch`/`Badge` do shadcn para alternar e exibir pago/pendente via `useAction(toggleExpensePaid)`, seguindo o padrão de erro/sucesso de T014 — FR-018 — depende de T029, T040
+- [X] T040 [US4] Criar `actions/toggle-expense-paid.ts` (`inputSchema { id, isPaid }`; altera só se a despesa pertence a `ctx.user.id`) — depende de T011, T024
+- [X] T041 [US4] Atualizar `components/expenses/expense-table.tsx` com `Switch`/`Badge` do shadcn para alternar e exibir pago/pendente via `useAction(toggleExpensePaid)`, seguindo o padrão de erro/sucesso de T014 — FR-018 — depende de T029, T040
 
 **Checkpoint**: US1–US4 funcionam de forma independente.
 
