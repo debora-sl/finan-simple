@@ -171,10 +171,10 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 **Purpose**: Portões de qualidade e validação final.
 
-- [ ] T046 [P] Rodar `pnpm lint` e corrigir todos os erros (Constituição, Princípio IV)
-- [ ] T047 Rodar `pnpm build` e corrigir erros de tipo/compilação
+- [X] T046 [P] Rodar `pnpm lint` e corrigir todos os erros (Constituição, Princípio IV)
+- [X] T047 Rodar `pnpm build` e corrigir erros de tipo/compilação
 - [ ] T048 Validar manualmente todos os cenários de `quickstart.md` (US1–US5), incluindo o teste de isolamento entre duas contas (SC-003/SC-004) e a superfície de erro/validação em ações recusadas — e-mail duplicado, valor inválido, nome de categoria duplicado (case-insensitive) — exibindo mensagem clara ao usuário (FR-018)
-- [ ] T049 [P] Conferir que `design/` não é importado por nenhum arquivo em `app/` ou `components/` (checagem de grep) e que nenhuma cor hard-coded foi introduzida fora dos tokens de `app/globals.css`
+- [X] T049 [P] Conferir que `design/` não é importado por nenhum arquivo em `app/` ou `components/` (checagem de grep) e que nenhuma cor hard-coded foi introduzida fora dos tokens de `app/globals.css`
 
 ---
 
