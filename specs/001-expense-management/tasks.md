@@ -71,14 +71,14 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Criar `lib/validation/auth.ts` (schemas Zod: signup `{ name: min(2), email, password: min(8) }`; login `{ email, password }`)
-- [ ] T016 [P] [US1] Criar `components/auth/signup-form.tsx` (client; shadcn `Form` + `react-hook-form` + resolver Zod de T015; chama `authClient.signUp.email`; erro de e-mail duplicado exibido no formulário — FR-002, Cenário US1.3)
-- [ ] T017 [P] [US1] Criar `components/auth/login-form.tsx` (client; chama `authClient.signIn.email`; erro genérico sem indicar campo — Cenário US1.4)
-- [ ] T018 [US1] Criar `app/(auth)/layout.tsx` (layout público, composição com `Card` do shadcn, referência `design/components/core/Card.prompt.md`)
-- [ ] T019 [US1] Criar `app/(auth)/signup/page.tsx` (renderiza `SignupForm`) — depende de T016, T018
-- [ ] T020 [US1] Criar `app/(auth)/login/page.tsx` (renderiza `LoginForm`) — depende de T017, T018
-- [ ] T021 [US1] Criar `app/(app)/layout.tsx` (layout autenticado: `verifySession()`, navegação via `Sidebar`/`Topbar` reconstruídos com shadcn a partir de `design/ui_kits/dashboard/Sidebar.jsx` e `Topbar.jsx`, botão de sair chamando `authClient.signOut` — FR-004, Cenário US1.5) — depende de T010
-- [ ] T022 [US1] Atualizar `app/page.tsx` para redirecionar a `/dashboard` (com sessão) ou `/login` (sem sessão) — depende de T010
+- [X] T015 [P] [US1] Criar `lib/validation/auth.ts` (schemas Zod: signup `{ name: min(2), email, password: min(8) }`; login `{ email, password }`)
+- [X] T016 [P] [US1] Criar `components/auth/signup-form.tsx` (client; shadcn `Form` + `react-hook-form` + resolver Zod de T015; chama `authClient.signUp.email`; erro de e-mail duplicado exibido no formulário — FR-002, Cenário US1.3)
+- [X] T017 [P] [US1] Criar `components/auth/login-form.tsx` (client; chama `authClient.signIn.email`; erro genérico sem indicar campo — Cenário US1.4)
+- [X] T018 [US1] Criar `app/(auth)/layout.tsx` (layout público, composição com `Card` do shadcn, referência `design/components/core/Card.prompt.md`)
+- [X] T019 [US1] Criar `app/(auth)/signup/page.tsx` (renderiza `SignupForm`) — depende de T016, T018
+- [X] T020 [US1] Criar `app/(auth)/login/page.tsx` (renderiza `LoginForm`) — depende de T017, T018
+- [X] T021 [US1] Criar `app/(app)/layout.tsx` (layout autenticado: `verifySession()`, navegação via `Sidebar`/`Topbar` reconstruídos com shadcn a partir de `design/ui_kits/dashboard/Sidebar.jsx` e `Topbar.jsx`, botão de sair chamando `authClient.signOut` — FR-004, Cenário US1.5) — depende de T010
+- [X] T022 [US1] Atualizar `app/page.tsx` para redirecionar a `/dashboard` (com sessão) ou `/login` (sem sessão) — depende de T010
 
 **Checkpoint**: US1 completa e testável de forma independente (cadastro, login, logout, bloqueio de rota sem sessão via `proxy.ts` + DAL).
 
