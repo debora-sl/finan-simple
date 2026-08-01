@@ -117,15 +117,15 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 ### Implementation for User Story 3
 
-- [ ] T031 [P] [US3] Criar `lib/validation/category.ts` (Zod: `name` trim/min1/max60)
-- [ ] T032 [P] [US3] Criar `data/categories.ts` (`getCategories(userId)` ordenado por `name`; `getCategoryById(userId, id)`) — depende de T006
-- [ ] T033 [US3] Criar `actions/create-category.ts` (deriva `nameLower = name.trim().toLowerCase()` e persiste; unicidade case-insensitive garantida por `@@unique([userId, nameLower])`; captura `P2002` do Prisma e retorna erro claro de nome duplicado — FR-011, FR-018) — depende de T011, T031, T032
-- [ ] T034 [US3] Criar `actions/update-category.ts` (mesma checagem de posse; recalcula `nameLower` ao renomear; mesma captura de duplicidade `P2002` com erro claro — FR-011, FR-018) — depende de T033
-- [ ] T035 [US3] Criar `actions/delete-category.ts` (remove; despesas associadas ficam com `categoryId = null` via `onDelete: SetNull` — FR-014) — depende de T033
-- [ ] T036 [P] [US3] Criar `components/categories/category-form.tsx` (client; `Dialog`/`Form` shadcn; `useAction` com o padrão de erro/sucesso de T014, incluindo a mensagem de nome duplicado de T033/T034 — FR-011, FR-018)
-- [ ] T037 [P] [US3] Criar `components/categories/category-list.tsx` (referência `design/components/finance/CategoryBar.prompt.md` e `CategoryIcon.prompt.md`)
-- [ ] T038 [US3] Criar `app/(app)/categories/page.tsx` (Server Component; busca `getCategories`; renderiza `CategoryList` + `CategoryForm`) — depende de T032, T036, T037
-- [ ] T039 [US3] Integrar `Select` de categoria (shadcn, referência `design/components/core/Select.prompt.md`) em `components/expenses/expense-form.tsx`, populado por `getCategories` — depende de T028, T032
+- [X] T031 [P] [US3] Criar `lib/validation/category.ts` (Zod: `name` trim/min1/max60)
+- [X] T032 [P] [US3] Criar `data/categories.ts` (`getCategories(userId)` ordenado por `name`; `getCategoryById(userId, id)`) — depende de T006
+- [X] T033 [US3] Criar `actions/create-category.ts` (deriva `nameLower = name.trim().toLowerCase()` e persiste; unicidade case-insensitive garantida por `@@unique([userId, nameLower])`; captura `P2002` do Prisma e retorna erro claro de nome duplicado — FR-011, FR-018) — depende de T011, T031, T032
+- [X] T034 [US3] Criar `actions/update-category.ts` (mesma checagem de posse; recalcula `nameLower` ao renomear; mesma captura de duplicidade `P2002` com erro claro — FR-011, FR-018) — depende de T033
+- [X] T035 [US3] Criar `actions/delete-category.ts` (remove; despesas associadas ficam com `categoryId = null` via `onDelete: SetNull` — FR-014) — depende de T033
+- [X] T036 [P] [US3] Criar `components/categories/category-form.tsx` (client; `Dialog`/`Form` shadcn; `useAction` com o padrão de erro/sucesso de T014, incluindo a mensagem de nome duplicado de T033/T034 — FR-011, FR-018)
+- [X] T037 [P] [US3] Criar `components/categories/category-list.tsx` (referência `design/components/finance/CategoryBar.prompt.md` e `CategoryIcon.prompt.md`)
+- [X] T038 [US3] Criar `app/(app)/categories/page.tsx` (Server Component; busca `getCategories`; renderiza `CategoryList` + `CategoryForm`) — depende de T032, T036, T037
+- [X] T039 [US3] Integrar `Select` de categoria (shadcn, referência `design/components/core/Select.prompt.md`) em `components/expenses/expense-form.tsx`, populado por `getCategories` — depende de T028, T032
 
 **Checkpoint**: US1 + US2 + US3 funcionam de forma independente (despesas podem ser associadas a categorias do próprio usuário).
 
