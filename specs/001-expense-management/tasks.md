@@ -32,9 +32,9 @@ Aplicação única (Next.js App Router, sem separação backend/frontend) — ve
 
 **Purpose**: Inicialização do projeto — dependências e shadcn/ui ainda não existem (`app/` só tem `layout.tsx`, `page.tsx`, `globals.css`).
 
-- [ ] T001 Instalar dependências via pnpm: `better-auth`, `prisma` (dev) + `@prisma/client`, `next-safe-action`, `zod`, `react-hook-form`, `@hookform/resolvers`, `lucide-react`, `recharts` (para o `chart` do shadcn)
-- [ ] T002 [P] Inicializar shadcn/ui (`pnpm dlx shadcn@latest init`) e gerar os componentes: `button`, `input`, `label`, `form`, `card`, `table`, `select`, `sheet`, `dialog`, `switch`, `badge`, `sonner`, `chart`, `progress` (base do `CategoryBar` — ver mapeamento DS→shadcn no `plan.md`) — confirmar que consomem os tokens já existentes em `app/globals.css` (não sobrescrever)
-- [ ] T003 [P] Criar `.env` e `.env.example` com `DATABASE_URL="file:./dev.db"`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL="http://localhost:3000"`
+- [X] T001 Instalar dependências via pnpm: `better-auth`, `prisma` (dev) + `@prisma/client`, `next-safe-action`, `zod`, `react-hook-form`, `@hookform/resolvers`, `lucide-react`, `recharts` (para o `chart` do shadcn)
+- [X] T002 [P] Inicializar shadcn/ui (`pnpm dlx shadcn@latest init`) e gerar os componentes: `button`, `input`, `label`, `form`, `card`, `table`, `select`, `sheet`, `dialog`, `switch`, `badge`, `sonner`, `chart`, `progress` (base do `CategoryBar` — ver mapeamento DS→shadcn no `plan.md`) — confirmar que consomem os tokens já existentes em `app/globals.css` (não sobrescrever)
+- [X] T003 [P] Criar `.env` e `.env.example` com `DATABASE_URL="file:./dev.db"`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL="http://localhost:3000"`
 
 ---
 

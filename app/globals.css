@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is([data-theme="dark"] *));
 
@@ -274,8 +276,6 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: var(--font-sans);
   font-size: var(--text-body);
   line-height: var(--leading-normal);
@@ -291,4 +291,16 @@ body {
 ::selection {
   background: var(--blue-100);
   color: var(--slate-900);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }
