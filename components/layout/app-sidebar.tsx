@@ -7,6 +7,7 @@ import { LayoutDashboard, LogOut, PiggyBank, Receipt, Tag } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -56,10 +57,17 @@ export function AppSidebar() {
         })}
       </nav>
 
-      <Button variant="ghost" className="justify-start gap-3 px-3" onClick={handleSignOut}>
-        <LogOut className="size-4.5" />
-        Sair
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          className="flex-1 justify-start gap-3 px-3"
+          onClick={handleSignOut}
+        >
+          <LogOut className="size-4.5" />
+          Sair
+        </Button>
+        <ThemeToggle />
+      </div>
     </aside>
   );
 }
