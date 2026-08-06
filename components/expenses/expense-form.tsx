@@ -177,7 +177,17 @@ export function ExpenseForm({
                 control={control}
                 name="categoryId"
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    items={[
+                      { value: NO_CATEGORY, label: "Sem categoria" },
+                      ...categories.map((category) => ({
+                        value: category.id,
+                        label: category.name,
+                      })),
+                    ]}
+                  >
                     <SelectTrigger id="categoryId" className="w-full">
                       <SelectValue placeholder="Sem categoria" />
                     </SelectTrigger>
