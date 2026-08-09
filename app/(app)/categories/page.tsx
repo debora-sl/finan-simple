@@ -1,14 +1,14 @@
 import { Plus } from "lucide-react";
 
-import { verifySession } from "@/lib/dal";
+import { getActiveHousehold } from "@/lib/active-household";
 import { getCategories } from "@/data/categories";
 import { Button } from "@/components/ui/button";
 import { CategoryForm } from "@/components/categories/category-form";
 import { CategoryList } from "@/components/categories/category-list";
 
 export default async function CategoriesPage() {
-  const { userId } = await verifySession();
-  const categories = await getCategories(userId);
+  const { householdId } = await getActiveHousehold();
+  const categories = await getCategories(householdId);
 
   return (
     <div className="flex flex-col gap-6">

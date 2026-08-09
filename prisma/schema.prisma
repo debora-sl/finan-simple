@@ -7,34 +7,81 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String
-  email         String   @unique
-  emailVerified Boolean  @default(false)
-  image         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  emailVerified     Boolean  @default(false)
+  image             String?
+  activeHouseholdId String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  expenses   Expense[]
-  categories Category[]
-  sessions   Session[]
-  accounts   Account[]
+  activeHousehold Household?   @relation("ActiveHousehold", fields: [activeHouseholdId], references: [id], onDelete: SetNull)
+  memberships     Membership[]
+  sessions        Session[]
+  accounts        Account[]
 
   @@map("user")
 }
 
-model Category {
+model Household {
   id        String   @id @default(cuid())
   name      String
-  nameLower String
-  userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expenses Expense[]
+  memberships    Membership[]
+  invitations    Invitation[]
+  expenses       Expense[]
+  categories     Category[]
+  activeForUsers User[]       @relation("ActiveHousehold")
 
-  @@unique([userId, nameLower])
+  @@map("household")
+}
+
+model Membership {
+  id          String   @id @default(cuid())
+  userId      String
+  householdId String
+  role        String
+  joinedAt    DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, householdId])
+  @@index([householdId])
+  @@index([householdId, role])
+  @@map("membership")
+}
+
+model Invitation {
+  id          String   @id @default(cuid())
+  email       String
+  householdId String
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, email])
+  @@index([email, status])
+  @@map("invitation")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  nameLower   String
+  householdId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+
+  @@unique([householdId, nameLower])
   @@map("category")
 }
 
@@ -45,15 +92,15 @@ model Expense {
   date          DateTime
   isPaid        Boolean  @default(false)
   categoryId    String?
-  userId        String
+  householdId   String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  category  Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
-  @@index([userId, date])
-  @@index([userId, categoryId])
+  @@index([householdId, date])
+  @@index([householdId, categoryId])
   @@map("expense")
 }
 

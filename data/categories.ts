@@ -1,14 +1,14 @@
 import { prisma } from "@/lib/prisma";
 
-export function getCategories(userId: string) {
+export function getCategories(householdId: string) {
   return prisma.category.findMany({
-    where: { userId },
+    where: { householdId },
     orderBy: { name: "asc" },
   });
 }
 
-export function getCategoryById(userId: string, id: string) {
+export function getCategoryById(householdId: string, id: string) {
   return prisma.category.findFirst({
-    where: { id, userId },
+    where: { id, householdId },
   });
 }

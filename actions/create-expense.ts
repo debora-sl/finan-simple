@@ -6,13 +6,16 @@ import { protectedActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { amountToCents } from "@/lib/money";
 import { createExpenseSchema } from "@/lib/validation/expense";
+import { getActiveHousehold } from "@/lib/active-household";
 
 export const createExpense = protectedActionClient
   .inputSchema(createExpenseSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput }) => {
+    const { householdId } = await getActiveHousehold();
+
     if (parsedInput.categoryId) {
       const category = await prisma.category.findFirst({
-        where: { id: parsedInput.categoryId, userId: ctx.user.id },
+        where: { id: parsedInput.categoryId, householdId },
       });
 
       if (!category) {
@@ -26,7 +29,7 @@ export const createExpense = protectedActionClient
         amountInCents: amountToCents(parsedInput.amount),
         date: parsedInput.date,
         categoryId: parsedInput.categoryId ?? null,
-        userId: ctx.user.id,
+        householdId,
       },
     });
 

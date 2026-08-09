@@ -12,23 +12,23 @@ export type DashboardSummary = {
   }>;
 };
 
-export async function getDashboardSummary(userId: string): Promise<DashboardSummary> {
+export async function getDashboardSummary(householdId: string): Promise<DashboardSummary> {
   const [totalAgg, paidAgg, byCategoryGroups, categories] = await Promise.all([
     prisma.expense.aggregate({
-      where: { userId },
+      where: { householdId },
       _sum: { amountInCents: true },
       _count: true,
     }),
     prisma.expense.aggregate({
-      where: { userId, isPaid: true },
+      where: { householdId, isPaid: true },
       _sum: { amountInCents: true },
     }),
     prisma.expense.groupBy({
       by: ["categoryId"],
-      where: { userId },
+      where: { householdId },
       _sum: { amountInCents: true },
     }),
-    prisma.category.findMany({ where: { userId }, select: { id: true, name: true } }),
+    prisma.category.findMany({ where: { householdId }, select: { id: true, name: true } }),
   ]);
 
   const categoryNames = new Map(categories.map((category) => [category.id, category.name]));

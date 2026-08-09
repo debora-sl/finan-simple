@@ -6,12 +6,15 @@ import { Prisma } from "@prisma/client";
 import { protectedActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { updateCategorySchema } from "@/lib/validation/category";
+import { getActiveHousehold } from "@/lib/active-household";
 
 export const updateCategory = protectedActionClient
   .inputSchema(updateCategorySchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput }) => {
+    const { householdId } = await getActiveHousehold();
+
     const category = await prisma.category.findFirst({
-      where: { id: parsedInput.id, userId: ctx.user.id },
+      where: { id: parsedInput.id, householdId },
     });
 
     if (!category) {

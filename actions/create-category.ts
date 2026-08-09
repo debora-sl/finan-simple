@@ -6,16 +6,19 @@ import { Prisma } from "@prisma/client";
 import { protectedActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { createCategorySchema } from "@/lib/validation/category";
+import { getActiveHousehold } from "@/lib/active-household";
 
 export const createCategory = protectedActionClient
   .inputSchema(createCategorySchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput }) => {
+    const { householdId } = await getActiveHousehold();
+
     try {
       const category = await prisma.category.create({
         data: {
           name: parsedInput.name,
           nameLower: parsedInput.name.toLowerCase(),
-          userId: ctx.user.id,
+          householdId,
         },
       });
 

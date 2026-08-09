@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 
-import { verifySession } from "@/lib/dal";
+import { getActiveHousehold } from "@/lib/active-household";
 import { getExpenses } from "@/data/expenses";
 import { getCategories } from "@/data/categories";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,10 @@ import { ExpenseForm } from "@/components/expenses/expense-form";
 import { ExpenseTable } from "@/components/expenses/expense-table";
 
 export default async function ExpensesPage() {
-  const { userId } = await verifySession();
+  const { householdId } = await getActiveHousehold();
   const [expenses, categories] = await Promise.all([
-    getExpenses(userId),
-    getCategories(userId),
+    getExpenses(householdId),
+    getCategories(householdId),
   ]);
 
   return (

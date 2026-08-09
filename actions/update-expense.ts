@@ -6,12 +6,15 @@ import { protectedActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { amountToCents } from "@/lib/money";
 import { updateExpenseSchema } from "@/lib/validation/expense";
+import { getActiveHousehold } from "@/lib/active-household";
 
 export const updateExpense = protectedActionClient
   .inputSchema(updateExpenseSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput }) => {
+    const { householdId } = await getActiveHousehold();
+
     const expense = await prisma.expense.findFirst({
-      where: { id: parsedInput.id, userId: ctx.user.id },
+      where: { id: parsedInput.id, householdId },
     });
 
     if (!expense) {
@@ -20,7 +23,7 @@ export const updateExpense = protectedActionClient
 
     if (parsedInput.categoryId) {
       const category = await prisma.category.findFirst({
-        where: { id: parsedInput.categoryId, userId: ctx.user.id },
+        where: { id: parsedInput.categoryId, householdId },
       });
 
       if (!category) {

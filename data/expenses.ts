@@ -1,16 +1,16 @@
 import { prisma } from "@/lib/prisma";
 
-export function getExpenses(userId: string) {
+export function getExpenses(householdId: string) {
   return prisma.expense.findMany({
-    where: { userId },
+    where: { householdId },
     include: { category: true },
     orderBy: { date: "desc" },
   });
 }
 
-export function getExpenseById(userId: string, id: string) {
+export function getExpenseById(householdId: string, id: string) {
   return prisma.expense.findFirst({
-    where: { id, userId },
+    where: { id, householdId },
     include: { category: true },
   });
 }

@@ -1,13 +1,13 @@
 import { LayoutDashboard } from "lucide-react";
 
-import { verifySession } from "@/lib/dal";
+import { getActiveHousehold } from "@/lib/active-household";
 import { getDashboardSummary } from "@/data/dashboard";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { CategoryBreakdown } from "@/components/dashboard/category-breakdown";
 
 export default async function DashboardPage() {
-  const { userId } = await verifySession();
-  const summary = await getDashboardSummary(userId);
+  const { householdId } = await getActiveHousehold();
+  const summary = await getDashboardSummary(householdId);
 
   return (
     <div className="flex flex-col gap-6">

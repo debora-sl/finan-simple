@@ -2,20 +2,30 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, LogOut, PiggyBank, Receipt, Tag } from "lucide-react";
+import { Home, LayoutDashboard, LogOut, PiggyBank, Receipt, Tag, UserRound } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { HouseholdSwitcher } from "@/components/layout/household-switcher";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/expenses", label: "Despesas", icon: Receipt },
   { href: "/categories", label: "Categorias", icon: Tag },
+  { href: "/households", label: "Residência", icon: Home },
 ];
 
-export function AppSidebar() {
+type HouseholdSummary = { id: string; name: string; role: string };
+
+export function AppSidebar({
+  households,
+  activeHouseholdId,
+}: {
+  households: HouseholdSummary[];
+  activeHouseholdId: string;
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -27,14 +37,13 @@ export function AppSidebar() {
   return (
     <aside className="flex w-60 shrink-0 flex-col gap-6 border-r border-border bg-card p-3.5">
       <div className="flex items-center gap-2.5 px-2 py-1">
-        <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <PiggyBank className="size-5" />
         </span>
-        <div className="leading-tight">
-          <p className="text-sm font-bold text-foreground">Controle</p>
-          <p className="text-xs text-muted-foreground">Financeiro</p>
-        </div>
+        <p className="text-sm font-bold text-foreground">Controle</p>
       </div>
+
+      <HouseholdSwitcher households={households} activeHouseholdId={activeHouseholdId} />
 
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
@@ -57,16 +66,31 @@ export function AppSidebar() {
         })}
       </nav>
 
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          className="flex-1 justify-start gap-3 px-3"
-          onClick={handleSignOut}
+      <div className="flex flex-col gap-1">
+        <Link
+          href="/profile"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            pathname.startsWith("/profile")
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+          )}
         >
-          <LogOut className="size-4.5" />
-          Sair
-        </Button>
-        <ThemeToggle />
+          <UserRound className="size-4.5" />
+          Perfil
+        </Link>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            className="flex-1 justify-start gap-3 px-3"
+            onClick={handleSignOut}
+          >
+            <LogOut className="size-4.5" />
+            Sair
+          </Button>
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   );

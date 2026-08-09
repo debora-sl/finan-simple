@@ -5,12 +5,15 @@ import { revalidatePath } from "next/cache";
 import { protectedActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { deleteCategorySchema } from "@/lib/validation/category";
+import { getActiveHousehold } from "@/lib/active-household";
 
 export const deleteCategory = protectedActionClient
   .inputSchema(deleteCategorySchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput }) => {
+    const { householdId } = await getActiveHousehold();
+
     const category = await prisma.category.findFirst({
-      where: { id: parsedInput.id, userId: ctx.user.id },
+      where: { id: parsedInput.id, householdId },
     });
 
     if (!category) {
