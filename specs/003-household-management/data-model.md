@@ -68,7 +68,7 @@ Transições de estado:
 PENDING ──aceitar (usuário cadastrado)──> ACCEPTED
 PENDING ──signup com e-mail correspondente──> ACCEPTED (auto, FR-016)
 PENDING ──cancelar (Administrador)──> CANCELLED
-ACCEPTED / CANCELLED ──aceitar──> REJEITADO (FR-023, edge case)
+ACCEPTED / CANCELLED ──aceitar──> operação REJEITADA, sem mudança de estado (FR-023, edge case)
 ```
 
 ### User (`user`) — alterações
@@ -102,7 +102,7 @@ migra para Household (ver abaixo). Campos de auth (`sessions`, `accounts`) inalt
   (`{ id, name }`), `switchHouseholdSchema` (`{ householdId }`).
 - **invitation**: `email` string trim lowercase `.email()`. Schemas: `inviteMemberSchema`
   (`{ email }` — householdId vem da casa ativa/ctx), `invitationIdSchema` (`{ invitationId }`),
-  `removeMemberSchema` (`{ membershipId }` ou `{ userId }`).
+  `removeMemberSchema` (`{ membershipId }`).
 
 ## Autorização (resumo por operação)
 
