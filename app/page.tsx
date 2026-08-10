@@ -15,7 +15,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-(--container-max) flex-col px-6 divide-y divide-border">
+    <div className="mx-auto flex w-full max-w-(--container-max) flex-col px-4 sm:px-6 divide-y divide-border">
       <HeroSection />
       <SummaryPreview />
       <DashboardPreview />

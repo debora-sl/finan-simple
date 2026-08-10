@@ -21,11 +21,11 @@ export function HeroSection() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Button size="lg" render={<Link href="/signup" />}>
-            Criar conta grátis
+          <Button size="lg" nativeButton={false} render={<Link href="/signup" />}>
+            Cadastrar
             <ArrowRight />
           </Button>
-          <Button size="lg" variant="outline" render={<Link href="/login" />}>
+          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/login" />}>
             Entrar
           </Button>
         </div>

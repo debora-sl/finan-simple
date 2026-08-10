@@ -6,24 +6,20 @@ import { APIError } from "better-auth/api";
 import { protectedActionClient } from "@/lib/action-client";
 import { auth } from "@/lib/auth";
 import { mapAuthError } from "@/lib/auth-errors";
-import { changePasswordSchema } from "@/lib/validation/profile";
+import { deleteAccountSchema } from "@/lib/validation/profile";
 
-export const changePassword = protectedActionClient
-  .inputSchema(changePasswordSchema)
+export const deleteAccount = protectedActionClient
+  .inputSchema(deleteAccountSchema)
   .action(async ({ parsedInput }) => {
     try {
-      await auth.api.changePassword({
-        body: {
-          currentPassword: parsedInput.currentPassword,
-          newPassword: parsedInput.newPassword,
-          revokeOtherSessions: true,
-        },
+      await auth.api.deleteUser({
+        body: { password: parsedInput.password },
         headers: await headers(),
       });
     } catch (error) {
       if (error instanceof APIError) {
         if (error.body?.code === "INVALID_PASSWORD") {
-          throw new Error("Senha atual incorreta.");
+          throw new Error("Senha incorreta.");
         }
 
         throw new Error(mapAuthError(error.body?.code));

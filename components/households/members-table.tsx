@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { UserMinus } from "lucide-react";
 
 import { removeMember } from "@/actions/remove-member";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -35,8 +36,7 @@ export function MembersTable({
 }) {
   const { execute: remove } = useAction(removeMember, {
     onSuccess: () => toast.success("Membro removido."),
-    onError: ({ error }) =>
-      toast.error(error.serverError ?? "Não foi possível remover o membro."),
+    onError: useActionErrorHandler("Não foi possível remover o membro."),
   });
 
   return (

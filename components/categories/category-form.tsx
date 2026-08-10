@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { createCategory } from "@/actions/create-category";
 import { updateCategory } from "@/actions/update-category";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { categorySchema, type CategoryInput } from "@/lib/validation/category";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,9 +57,7 @@ export function CategoryForm({
       toast.success(isEdit ? "Categoria atualizada." : "Categoria criada.");
       setOpen(false);
     },
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível salvar a categoria.");
-    },
+    onError: useActionErrorHandler("Não foi possível salvar a categoria."),
   };
 
   const createAction = useAction(createCategory, actionOptions);

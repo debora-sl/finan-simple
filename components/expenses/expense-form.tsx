@@ -9,6 +9,7 @@ import { z } from "zod";
 
 import { createExpense } from "@/actions/create-expense";
 import { updateExpense } from "@/actions/update-expense";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -98,9 +99,7 @@ export function ExpenseForm({
       toast.success(isEdit ? "Despesa atualizada." : "Despesa criada.");
       setOpen(false);
     },
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível salvar a despesa.");
-    },
+    onError: useActionErrorHandler("Não foi possível salvar a despesa."),
   };
 
   const createAction = useAction(createExpense, actionOptions);

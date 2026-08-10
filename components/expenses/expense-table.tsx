@@ -6,6 +6,7 @@ import { Pencil, Trash2 } from "lucide-react";
 
 import { deleteExpense } from "@/actions/delete-expense";
 import { toggleExpensePaid } from "@/actions/toggle-expense-paid";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { formatCentsAsCurrency } from "@/lib/money";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,13 +44,11 @@ export function ExpenseTable({
 }) {
   const { execute: removeExpense } = useAction(deleteExpense, {
     onSuccess: () => toast.success("Despesa removida."),
-    onError: ({ error }) =>
-      toast.error(error.serverError ?? "Não foi possível remover a despesa."),
+    onError: useActionErrorHandler("Não foi possível remover a despesa."),
   });
 
   const { execute: togglePaid } = useAction(toggleExpensePaid, {
-    onError: ({ error }) =>
-      toast.error(error.serverError ?? "Não foi possível atualizar o status da despesa."),
+    onError: useActionErrorHandler("Não foi possível atualizar o status da despesa."),
   });
 
   if (expenses.length === 0) {
@@ -89,7 +88,7 @@ export function ExpenseTable({
               )}
             </TableCell>
             <TableCell>{dateFormatter.format(new Date(expense.date))}</TableCell>
-            <TableCell className="text-right">
+            <TableCell className="cf-money text-right font-semibold text-foreground">
               {formatCentsAsCurrency(expense.amountInCents)}
             </TableCell>
             <TableCell>

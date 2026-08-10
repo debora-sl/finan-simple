@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
 
 import { switchActiveHousehold } from "@/actions/switch-active-household";
+import { useActionErrorHandler } from "@/lib/action-error";
 import {
   Select,
   SelectContent,
@@ -32,9 +32,7 @@ export function HouseholdSwitcher({
     onSuccess: () => {
       router.refresh();
     },
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível trocar de residência.");
-    },
+    onError: useActionErrorHandler("Não foi possível trocar de residência."),
   });
 
   function handleValueChange(value: string | null) {

@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/dal";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { PasswordForm } from "@/components/profile/password-form";
+import { DeleteAccountCard } from "@/components/profile/delete-account-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function ProfilePage() {
@@ -30,6 +31,8 @@ export default async function ProfilePage() {
           <PasswordForm />
         </CardContent>
       </Card>
+
+      <DeleteAccountCard />
     </div>
   );
 }

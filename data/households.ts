@@ -26,6 +26,31 @@ export function getMembership(userId: string, householdId: string) {
   });
 }
 
+export async function deleteHouseholdById(householdId: string) {
+  await prisma.$transaction(async (tx) => {
+    const affectedUsers = await tx.user.findMany({
+      where: { activeHouseholdId: householdId },
+      select: { id: true },
+    });
+
+    await tx.household.delete({ where: { id: householdId } });
+
+    for (const user of affectedUsers) {
+      const nextMembership = await tx.membership.findFirst({
+        where: { userId: user.id },
+        orderBy: { joinedAt: "asc" },
+      });
+
+      if (nextMembership) {
+        await tx.user.update({
+          where: { id: user.id },
+          data: { activeHouseholdId: nextMembership.householdId },
+        });
+      }
+    }
+  });
+}
+
 export async function handleAdminDeparture(householdId: string, leavingUserId: string) {
   await prisma.$transaction(async (tx) => {
     const membership = await tx.membership.findUnique({

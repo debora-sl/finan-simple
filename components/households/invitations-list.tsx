@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 
 import { cancelInvitation } from "@/actions/cancel-invitation";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,22 +19,36 @@ import {
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
 
+type InvitationStatus = "PENDING" | "ACCEPTED" | "REJECTED";
+
 type Invitation = {
   id: string;
   email: string;
+  status: InvitationStatus;
   createdAt: Date;
+};
+
+const statusLabels: Record<InvitationStatus, string> = {
+  PENDING: "Enviado",
+  ACCEPTED: "Aceito",
+  REJECTED: "Recusado",
+};
+
+const statusVariants: Record<InvitationStatus, "secondary" | "default" | "destructive"> = {
+  PENDING: "secondary",
+  ACCEPTED: "default",
+  REJECTED: "destructive",
 };
 
 export function InvitationsList({ invitations }: { invitations: Invitation[] }) {
   const { execute: cancel } = useAction(cancelInvitation, {
     onSuccess: () => toast.success("Convite cancelado."),
-    onError: ({ error }) =>
-      toast.error(error.serverError ?? "Não foi possível cancelar o convite."),
+    onError: useActionErrorHandler("Não foi possível cancelar o convite."),
   });
 
   if (invitations.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">Nenhum convite pendente.</p>
+      <p className="text-sm text-muted-foreground">Nenhum convite.</p>
     );
   }
 
@@ -55,17 +70,21 @@ export function InvitationsList({ invitations }: { invitations: Invitation[] }) 
             </TableCell>
             <TableCell>{dateFormatter.format(new Date(invitation.createdAt))}</TableCell>
             <TableCell>
-              <Badge variant="secondary">Pendente</Badge>
+              <Badge variant={statusVariants[invitation.status]}>
+                {statusLabels[invitation.status]}
+              </Badge>
             </TableCell>
             <TableCell>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Cancelar convite"
-                onClick={() => cancel({ invitationId: invitation.id })}
-              >
-                <X />
-              </Button>
+              {invitation.status === "PENDING" && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Cancelar convite"
+                  onClick={() => cancel({ invitationId: invitation.id })}
+                >
+                  <X />
+                </Button>
+              )}
             </TableCell>
           </TableRow>
         ))}

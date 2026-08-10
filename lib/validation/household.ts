@@ -17,3 +17,7 @@ export type UpdateHouseholdInput = z.infer<typeof updateHouseholdSchema>;
 export const switchHouseholdSchema = z.object({
   householdId: z.string().min(1),
 });
+
+export const deleteHouseholdSchema = z.object({
+  householdId: z.string().min(1),
+});

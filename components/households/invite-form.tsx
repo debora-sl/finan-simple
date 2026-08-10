@@ -6,6 +6,7 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 import { inviteMember } from "@/actions/invite-member";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { inviteMemberSchema, type InviteMemberInput } from "@/lib/validation/invitation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,9 +27,7 @@ export function InviteForm() {
       toast.success("Convite enviado.");
       reset();
     },
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível enviar o convite.");
-    },
+    onError: useActionErrorHandler("Não foi possível enviar o convite."),
   });
 
   function onSubmit(values: InviteMemberInput) {

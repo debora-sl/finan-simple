@@ -1,28 +1,21 @@
 import { getActiveHousehold } from "@/lib/active-household";
-import { getCurrentUser } from "@/lib/dal";
 import { getHouseholdById } from "@/data/households";
-import {
-  getMembers,
-  getPendingInvitations,
-  getPendingInvitationsForEmail,
-} from "@/data/memberships";
-import { IncomingInvitations } from "@/components/households/incoming-invitations";
+import { getHouseholdInvitations, getMembers } from "@/data/memberships";
 import { InviteForm } from "@/components/households/invite-form";
 import { MembersTable } from "@/components/households/members-table";
 import { InvitationsList } from "@/components/households/invitations-list";
 import { HouseholdNameForm } from "@/components/households/household-name-form";
 import { LeaveHouseholdButton } from "@/components/households/leave-household-button";
+import { DeleteHouseholdButton } from "@/components/households/delete-household-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function HouseholdsPage() {
   const { userId, householdId, role } = await getActiveHousehold();
-  const currentUser = await getCurrentUser();
 
-  const [household, members, pendingInvitations, incomingInvitations] = await Promise.all([
+  const [household, members, invitations] = await Promise.all([
     getHouseholdById(householdId),
     getMembers(householdId),
-    getPendingInvitations(householdId),
-    getPendingInvitationsForEmail(currentUser.email),
+    getHouseholdInvitations(householdId),
   ]);
 
   const isAdmin = role === "ADMIN";
@@ -37,8 +30,6 @@ export default async function HouseholdsPage() {
           Gerencie os membros e convites da sua residência.
         </p>
       </div>
-
-      <IncomingInvitations invitations={incomingInvitations} />
 
       {isAdmin && household && (
         <Card>
@@ -74,10 +65,10 @@ export default async function HouseholdsPage() {
       {isAdmin && (
         <Card>
           <CardHeader>
-            <CardTitle>Convites pendentes</CardTitle>
+            <CardTitle>Convites</CardTitle>
           </CardHeader>
           <CardContent>
-            <InvitationsList invitations={pendingInvitations} />
+            <InvitationsList invitations={invitations} />
           </CardContent>
         </Card>
       )}
@@ -90,6 +81,17 @@ export default async function HouseholdsPage() {
           <LeaveHouseholdButton householdId={householdId} />
         </CardContent>
       </Card>
+
+      {isAdmin && household && (
+        <Card className="border-destructive/50">
+          <CardHeader>
+            <CardTitle>Zona de perigo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DeleteHouseholdButton householdId={household.id} householdName={household.name} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

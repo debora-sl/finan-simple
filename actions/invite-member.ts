@@ -29,14 +29,18 @@ export const inviteMember = protectedActionClient
       where: { email: parsedInput.email },
     });
 
-    if (invitedUser) {
-      const membership = await prisma.membership.findUnique({
-        where: { userId_householdId: { userId: invitedUser.id, householdId } },
-      });
+    if (!invitedUser) {
+      throw new Error(
+        "Não existe uma conta com este e-mail. Peça para a pessoa se cadastrar primeiro."
+      );
+    }
 
-      if (membership) {
-        throw new Error("Esse e-mail já pertence a um membro da residência.");
-      }
+    const membership = await prisma.membership.findUnique({
+      where: { userId_householdId: { userId: invitedUser.id, householdId } },
+    });
+
+    if (membership) {
+      throw new Error("Esse e-mail já pertence a um membro da residência.");
     }
 
     const existingInvitation = await prisma.invitation.findUnique({
@@ -47,11 +51,15 @@ export const inviteMember = protectedActionClient
       throw new Error("Já existe um convite pendente para esse e-mail.");
     }
 
-    await prisma.invitation.upsert({
-      where: { householdId_email: { householdId, email: parsedInput.email } },
-      create: { householdId, email: parsedInput.email },
-      update: { status: "PENDING" },
-    });
+    if (existingInvitation?.status === "REJECTED") {
+      throw new Error("Este e-mail recusou um convite anterior para esta residência.");
+    }
+
+    if (!existingInvitation) {
+      await prisma.invitation.create({
+        data: { householdId, email: parsedInput.email, invitedById: ctx.user.id },
+      });
+    }
 
     revalidatePath("/households");
   });

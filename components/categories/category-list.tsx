@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { deleteCategory } from "@/actions/delete-category";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { Button } from "@/components/ui/button";
 import { CategoryForm } from "@/components/categories/category-form";
 import { CategoryIcon } from "@/components/categories/category-icon";
@@ -14,8 +15,7 @@ type Category = { id: string; name: string };
 export function CategoryList({ categories }: { categories: Category[] }) {
   const { execute: removeCategory } = useAction(deleteCategory, {
     onSuccess: () => toast.success("Categoria removida."),
-    onError: ({ error }) =>
-      toast.error(error.serverError ?? "Não foi possível remover a categoria."),
+    onError: useActionErrorHandler("Não foi possível remover a categoria."),
   });
 
   if (categories.length === 0) {

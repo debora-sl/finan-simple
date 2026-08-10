@@ -19,6 +19,16 @@ export const changePasswordSchema = z
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "As senhas não coincidem",
     path: ["confirmPassword"],
+  })
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: "A nova senha deve ser diferente da atual",
+    path: ["newPassword"],
   });
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
+export const deleteAccountSchema = z.object({
+  password: z.string().min(1, "Informe sua senha"),
+});
+
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;

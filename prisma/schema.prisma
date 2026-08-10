@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
@@ -16,10 +16,11 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  activeHousehold Household?   @relation("ActiveHousehold", fields: [activeHouseholdId], references: [id], onDelete: SetNull)
-  memberships     Membership[]
-  sessions        Session[]
-  accounts        Account[]
+  activeHousehold     Household?   @relation("ActiveHousehold", fields: [activeHouseholdId], references: [id], onDelete: SetNull)
+  memberships         Membership[]
+  sessions            Session[]
+  accounts            Account[]
+  authoredInvitations Invitation[] @relation("InvitationAuthor")
 
   @@map("user")
 }
@@ -59,11 +60,13 @@ model Invitation {
   id          String   @id @default(cuid())
   email       String
   householdId String
+  invitedById String?
   status      String   @default("PENDING")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  invitedBy User?     @relation("InvitationAuthor", fields: [invitedById], references: [id], onDelete: SetNull)
 
   @@unique([householdId, email])
   @@index([email, status])

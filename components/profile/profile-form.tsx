@@ -6,6 +6,7 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 import { updateProfile } from "@/actions/update-profile";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { updateProfileSchema, type UpdateProfileInput } from "@/lib/validation/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,9 +24,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
 
   const { execute, isPending } = useAction(updateProfile, {
     onSuccess: () => toast.success("Perfil atualizado."),
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível atualizar o perfil.");
-    },
+    onError: useActionErrorHandler("Não foi possível atualizar o perfil."),
   });
 
   function onSubmit(values: UpdateProfileInput) {

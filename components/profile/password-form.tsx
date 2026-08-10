@@ -6,6 +6,7 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 import { changePassword } from "@/actions/change-password";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { changePasswordSchema, type ChangePasswordInput } from "@/lib/validation/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,9 +28,7 @@ export function PasswordForm() {
       toast.success("Senha alterada.");
       reset();
     },
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível alterar a senha.");
-    },
+    onError: useActionErrorHandler("Não foi possível alterar a senha."),
   });
 
   function onSubmit(values: ChangePasswordInput) {

@@ -3,17 +3,25 @@
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 import { acceptInvitation } from "@/actions/accept-invitation";
+import { rejectInvitation } from "@/actions/reject-invitation";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const dateFormatter = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type IncomingInvitation = {
   id: string;
   householdName: string;
+  invitedByName: string;
   createdAt: Date;
 };
 
@@ -24,49 +32,55 @@ export function IncomingInvitations({
 }) {
   const router = useRouter();
 
-  const { execute, isPending } = useAction(acceptInvitation, {
+  const { execute: accept, isPending: isAccepting } = useAction(acceptInvitation, {
     onSuccess: () => {
       toast.success("Convite aceito.");
       router.push("/dashboard");
     },
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível aceitar o convite.");
-    },
+    onError: useActionErrorHandler("Não foi possível aceitar o convite."),
   });
 
-  if (invitations.length === 0) {
+  const { execute: reject, isPending: isRejecting } = useAction(rejectInvitation, {
+    onSuccess: () => toast.success("Convite recusado."),
+    onError: useActionErrorHandler("Não foi possível recusar o convite."),
+  });
+
+  const invitation = invitations[0];
+
+  if (!invitation) {
     return null;
   }
 
+  const isPending = isAccepting || isRejecting;
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Convites recebidos</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        {invitations.map((invitation) => (
-          <div
-            key={invitation.id}
-            className="flex items-center justify-between gap-4 rounded-lg border border-border px-4 py-3"
+    <Dialog open onOpenChange={() => {}}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>Convite para colaborar</DialogTitle>
+          <DialogDescription>
+            Olá, você recebeu um convite de {invitation.invitedByName} para colaborar com o
+            controle financeiro da residência: {invitation.householdName}.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            disabled={isPending}
+            onClick={() => reject({ invitationId: invitation.id })}
           >
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                {invitation.householdName}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Convite enviado em {dateFormatter.format(new Date(invitation.createdAt))}
-              </p>
-            </div>
-            <Button
-              disabled={isPending}
-              onClick={() => execute({ invitationId: invitation.id })}
-            >
-              <Check />
-              Aceitar
-            </Button>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+            <X />
+            Recusar
+          </Button>
+          <Button
+            disabled={isPending}
+            onClick={() => accept({ invitationId: invitation.id })}
+          >
+            <Check />
+            Aceitar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

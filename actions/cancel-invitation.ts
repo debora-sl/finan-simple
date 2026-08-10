@@ -28,9 +28,8 @@ export const cancelInvitation = protectedActionClient
       throw new Error("Esse convite não está mais pendente.");
     }
 
-    await prisma.invitation.update({
+    await prisma.invitation.delete({
       where: { id: invitation.id },
-      data: { status: "CANCELLED" },
     });
 
     revalidatePath("/households");

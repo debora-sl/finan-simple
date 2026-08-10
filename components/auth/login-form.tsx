@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
+import { mapAuthError } from "@/lib/auth-errors";
+import { checkEmailExists } from "@/actions/check-email-exists";
 import { loginSchema, type LoginInput } from "@/lib/validation/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,14 +33,22 @@ export function LoginForm() {
   async function onSubmit(values: LoginInput) {
     setIsLoading(true);
 
+    const emailCheck = await checkEmailExists({ email: values.email });
+
+    if (emailCheck?.data?.exists === false) {
+      toast.error("Não encontramos uma conta com este e-mail. Que tal criar uma?");
+      setIsLoading(false);
+      return;
+    }
+
     await authClient.signIn.email(
       { email: values.email, password: values.password },
       {
         onSuccess: () => {
           router.push("/expenses");
         },
-        onError: () => {
-          toast.error("E-mail ou senha inválidos.");
+        onError: (ctx) => {
+          toast.error(ctx.error.status === 403 ? mapAuthError(403) : "Senha incorreta.");
         },
       }
     );

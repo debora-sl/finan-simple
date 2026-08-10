@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
+import { mapAuthError } from "@/lib/auth-errors";
 import { signupSchema, type SignupInput } from "@/lib/validation/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,9 +41,9 @@ export function SignupForm() {
         },
         onError: (ctx) => {
           if (ctx.error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL") {
-            setError("email", { message: "Este e-mail já está cadastrado." });
+            setError("email", { message: mapAuthError(ctx.error.code) });
           } else {
-            toast.error(ctx.error.message || "Não foi possível criar a conta.");
+            toast.error(mapAuthError(ctx.error.code));
           }
         },
       }

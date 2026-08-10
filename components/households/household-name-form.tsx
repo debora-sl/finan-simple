@@ -6,6 +6,7 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 import { updateHousehold } from "@/actions/update-household";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { updateHouseholdSchema, type UpdateHouseholdInput } from "@/lib/validation/household";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,9 +24,7 @@ export function HouseholdNameForm({ id, name }: { id: string; name: string }) {
 
   const { execute, isPending } = useAction(updateHousehold, {
     onSuccess: () => toast.success("Nome da residência atualizado."),
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível atualizar a residência.");
-    },
+    onError: useActionErrorHandler("Não foi possível atualizar a residência."),
   });
 
   function onSubmit(values: UpdateHouseholdInput) {

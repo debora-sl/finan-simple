@@ -7,6 +7,7 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 import { createHousehold } from "@/actions/create-household";
+import { useActionErrorHandler } from "@/lib/action-error";
 import { householdSchema, type HouseholdInput } from "@/lib/validation/household";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,9 +29,7 @@ export function HouseholdForm() {
       toast.success("Residência criada.");
       router.push("/dashboard");
     },
-    onError: ({ error }: { error: { serverError?: string } }) => {
-      toast.error(error.serverError ?? "Não foi possível criar a residência.");
-    },
+    onError: useActionErrorHandler("Não foi possível criar a residência."),
   });
 
   function onSubmit(values: HouseholdInput) {

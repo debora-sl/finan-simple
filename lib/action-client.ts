@@ -13,7 +13,7 @@ export const protectedActionClient = actionClient.use(async ({ next }) => {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
-    throw new Error("Não autorizado.");
+    throw new Error("SESSION_EXPIRED");
   }
 
   return next({ ctx: { user: { id: session.user.id } } });

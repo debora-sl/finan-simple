@@ -12,7 +12,7 @@ export const verifySession = cache(async () => {
   const session = await getSessionData();
 
   if (!session) {
-    redirect("/login");
+    redirect("/");
   }
 
   return { userId: session.user.id };
