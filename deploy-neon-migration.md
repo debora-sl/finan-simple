@@ -212,7 +212,10 @@ Na Vercel:
 - [x] Migrations recriadas para Postgres (`20260810033842_init`)
 - [x] `package.json` → `build` e `postinstall` com `prisma generate`
 - [x] `prisma.config.ts` → migrations usam `DIRECT_URL` (conexão direta do Neon)
-- [ ] `migrate deploy` aplicado no banco de produção (rodar se o banco de prod for diferente do de dev)
-- [ ] Variáveis na Vercel (`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`)
+- [x] `migrate deploy` aplicado no banco de produção (`20260810033842_init`)
+- [x] Variáveis na Vercel (`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`)
 - [x] `.env.example` atualizado
-- [x] Fluxo crítico testado local (smoke test: query + transação interativa contra o Neon); produção pendente
+- [x] Fluxo crítico testado local (smoke test: query + transação interativa contra o Neon)
+- [x] Deploy na Vercel concluído em `https://finan-simple.vercel.app`; cadastro validado em produção
+
+> **Aprendizado (500 no primeiro deploy):** `DATABASE_URL` colada com formato inválido causou `PrismaClientKnownRequestError` / `ERR_INVALID_URL` (`Invalid URL`) no adapter Neon. Correção: colar a connection string **pooled** (host com `-pooler`) crua — sem `psql`, sem aspas, sem espaços/quebras. Valor de env var só entra em vigor após **Redeploy**.
