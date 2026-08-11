@@ -174,7 +174,7 @@ Aplicação Next.js App Router monolítica. Pastas convencionais na raiz: `prism
 **Purpose**: Portão de qualidade e validação final
 
 - [X] T037 Corrigir todos os erros de ESLint (`pnpm lint` sem erros) — portão obrigatório da constituição
-- [ ] T038 Executar o roteiro de validação manual de `specs/004-pre-deploy-refinements/quickstart.md` cobrindo US1–US7 e confirmando SC-001 a SC-008 (pendente: requer navegador/servidor local, que a constituição proíbe iniciar via `npm run dev`; validar manualmente antes do deploy)
+- [X] T038 Executar o roteiro de validação manual de `specs/004-pre-deploy-refinements/quickstart.md` cobrindo US1–US7 e confirmando SC-001 a SC-008 (validado manualmente em produção após o deploy na Vercel)
 
 ---
 
