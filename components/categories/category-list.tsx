@@ -2,13 +2,14 @@
 
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 import { deleteCategory } from "@/actions/delete-category";
 import { useActionErrorHandler } from "@/lib/action-error";
 import { Button } from "@/components/ui/button";
 import { CategoryForm } from "@/components/categories/category-form";
 import { CategoryIcon } from "@/components/categories/category-icon";
+import { ConfirmDeleteButton } from "@/components/shared/confirm-delete-button";
 
 type Category = { id: string; name: string };
 
@@ -49,14 +50,13 @@ export function CategoryList({ categories }: { categories: Category[] }) {
                 </Button>
               }
             />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Remover categoria"
-              onClick={() => removeCategory({ id: category.id })}
-            >
-              <Trash2 />
-            </Button>
+            <ConfirmDeleteButton
+              triggerLabel="Remover categoria"
+              title="Remover categoria"
+              description={`Tem certeza que deseja remover a categoria "${category.name}"? As despesas dessa categoria ficarão sem categoria. Esta ação não pode ser desfeita.`}
+              confirmLabel="Remover"
+              onConfirm={() => removeCategory({ id: category.id })}
+            />
           </div>
         </li>
       ))}

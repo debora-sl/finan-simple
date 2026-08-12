@@ -56,7 +56,7 @@ export function SummaryCards({
 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-3">
-      <SummaryTile label="Total" valueInCents={totalInCents} tone="action" icon={Wallet} />
+      <SummaryTile label="Total Despesas" valueInCents={totalInCents} tone="action" icon={Wallet} />
       <SummaryTile label="Pago" valueInCents={paidInCents} tone="positive" icon={CheckCircle2} />
       <SummaryTile label="Pendente" valueInCents={pendingInCents} tone="warning" icon={Clock} />
     </div>

@@ -59,7 +59,7 @@ export function HouseholdSwitcher({
       <SelectTrigger className="w-full">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent alignItemWithTrigger={false}>
         {households.map((household) => (
           <SelectItem key={household.id} value={household.id}>
             {household.name}

@@ -45,7 +45,28 @@ export function CategoryBreakdown({
         <div className="relative mx-auto aspect-square w-full max-w-56">
           <ChartContainer config={chartConfig} className="aspect-square">
             <PieChart>
-              <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    hideLabel
+                    nameKey="name"
+                    formatter={(value, name, item) => (
+                      <div className="flex w-full items-center justify-between gap-4">
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <span
+                            className="size-2.5 shrink-0 rounded-[2px]"
+                            style={{ backgroundColor: item.payload?.color }}
+                          />
+                          {name}
+                        </span>
+                        <span className="cf-money font-medium text-foreground tabular-nums">
+                          {formatCentsAsCurrency(Number(value))}
+                        </span>
+                      </div>
+                    )}
+                  />
+                }
+              />
               <Pie
                 data={data}
                 dataKey="value"

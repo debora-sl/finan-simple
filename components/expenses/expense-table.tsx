@@ -2,7 +2,7 @@
 
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 import { deleteExpense } from "@/actions/delete-expense";
 import { toggleExpensePaid } from "@/actions/toggle-expense-paid";
@@ -12,6 +12,7 @@ import { formatCalendarDate } from "@/lib/date";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { ConfirmDeleteButton } from "@/components/shared/confirm-delete-button";
 import {
   Table,
   TableBody,
@@ -142,14 +143,13 @@ export function ExpenseTable({
                     </Button>
                   }
                 />
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label="Remover despesa"
-                  onClick={() => removeExpense({ id: expense.id })}
-                >
-                  <Trash2 />
-                </Button>
+                <ConfirmDeleteButton
+                  triggerLabel="Remover despesa"
+                  title="Remover despesa"
+                  description={`Tem certeza que deseja remover "${expense.description}"? Esta ação não pode ser desfeita.`}
+                  confirmLabel="Remover"
+                  onConfirm={() => removeExpense({ id: expense.id })}
+                />
               </div>
             </TableCell>
           </TableRow>
