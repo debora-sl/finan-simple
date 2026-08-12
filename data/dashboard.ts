@@ -20,7 +20,7 @@ export async function getDashboardSummary(householdId: string): Promise<Dashboar
       _count: true,
     }),
     prisma.expense.aggregate({
-      where: { householdId, isPaid: true },
+      where: { householdId, paidDate: { not: null } },
       _sum: { amountInCents: true },
     }),
     prisma.expense.groupBy({

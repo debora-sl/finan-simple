@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
@@ -10,8 +10,10 @@ import { z } from "zod";
 import { createExpense } from "@/actions/create-expense";
 import { updateExpense } from "@/actions/update-expense";
 import { useActionErrorHandler } from "@/lib/action-error";
+import { toDateInputValue } from "@/lib/date";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Sheet,
   SheetContent,
@@ -32,12 +34,33 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 
 const NO_CATEGORY = "none";
 
-const expenseFormSchema = z.object({
-  description: z.string().trim().min(1, "Descrição obrigatória"),
-  amount: z.string().trim().min(1, "Valor obrigatório"),
-  date: z.string().trim().min(1, "Data obrigatória"),
-  categoryId: z.string(),
-});
+const calendarDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+const expenseFormSchema = z
+  .object({
+    description: z.string().trim().min(1, "Descrição obrigatória"),
+    amount: z.string().trim().min(1, "Valor obrigatório"),
+    dueDate: z
+      .string()
+      .regex(calendarDateRegex, "Data inválida")
+      .or(z.literal("")),
+    hasNoDueDate: z.boolean(),
+    paidDate: z
+      .string()
+      .regex(calendarDateRegex, "Data inválida")
+      .or(z.literal("")),
+    categoryId: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.hasNoDueDate && !data.dueDate) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["dueDate"],
+        message:
+          "Informe a data de vencimento ou marque 'Sem data de vencimento'.",
+      });
+    }
+  });
 
 type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
 
@@ -47,19 +70,37 @@ type ExpenseRecord = {
   id: string;
   description: string;
   amountInCents: number;
-  date: Date | string;
+  dueDate: Date | string | null;
+  paidDate: Date | string | null;
   categoryId: string | null;
 };
 
+function getLocalToday(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function toDefaultValues(expense?: ExpenseRecord): ExpenseFormValues {
   if (!expense) {
-    return { description: "", amount: "", date: "", categoryId: NO_CATEGORY };
+    return {
+      description: "",
+      amount: "",
+      dueDate: "",
+      hasNoDueDate: false,
+      paidDate: "",
+      categoryId: NO_CATEGORY,
+    };
   }
 
   return {
     description: expense.description,
     amount: (expense.amountInCents / 100).toFixed(2),
-    date: new Date(expense.date).toISOString().slice(0, 10),
+    dueDate: expense.dueDate ? toDateInputValue(new Date(expense.dueDate)) : "",
+    hasNoDueDate: !expense.dueDate,
+    paidDate: expense.paidDate ? toDateInputValue(new Date(expense.paidDate)) : "",
     categoryId: expense.categoryId ?? NO_CATEGORY,
   };
 }
@@ -81,11 +122,14 @@ export function ExpenseForm({
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseFormSchema),
     defaultValues: toDefaultValues(expense),
   });
+
+  const hasNoDueDate = useWatch({ control, name: "hasNoDueDate" });
 
   useEffect(() => {
     if (open) {
@@ -110,7 +154,10 @@ export function ExpenseForm({
     const payload = {
       description: values.description,
       amount: Number(values.amount.replace(",", ".")),
-      date: new Date(values.date),
+      dueDate: values.hasNoDueDate ? undefined : values.dueDate,
+      hasNoDueDate: values.hasNoDueDate,
+      paidDate: values.paidDate || undefined,
+      clientToday: values.paidDate ? getLocalToday() : undefined,
       categoryId: values.categoryId === NO_CATEGORY ? undefined : values.categoryId,
     };
 
@@ -159,15 +206,48 @@ export function ExpenseForm({
               <FieldError errors={errors.amount ? [errors.amount] : undefined} />
             </Field>
 
-            <Field data-invalid={!!errors.date}>
-              <FieldLabel htmlFor="date">Data</FieldLabel>
+            <Field data-invalid={!!errors.dueDate}>
+              <FieldLabel htmlFor="dueDate">Vencimento</FieldLabel>
               <Input
-                id="date"
+                id="dueDate"
                 type="date"
-                aria-invalid={!!errors.date}
-                {...register("date")}
+                disabled={hasNoDueDate}
+                aria-invalid={!!errors.dueDate}
+                {...register("dueDate")}
               />
-              <FieldError errors={errors.date ? [errors.date] : undefined} />
+              <FieldError errors={errors.dueDate ? [errors.dueDate] : undefined} />
+            </Field>
+
+            <Field orientation="horizontal">
+              <Controller
+                control={control}
+                name="hasNoDueDate"
+                render={({ field }) => (
+                  <Checkbox
+                    id="hasNoDueDate"
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      const isChecked = checked === true;
+                      field.onChange(isChecked);
+                      if (isChecked) {
+                        setValue("dueDate", "");
+                      }
+                    }}
+                  />
+                )}
+              />
+              <FieldLabel htmlFor="hasNoDueDate">Sem data de vencimento</FieldLabel>
+            </Field>
+
+            <Field data-invalid={!!errors.paidDate}>
+              <FieldLabel htmlFor="paidDate">Pagamento</FieldLabel>
+              <Input
+                id="paidDate"
+                type="date"
+                aria-invalid={!!errors.paidDate}
+                {...register("paidDate")}
+              />
+              <FieldError errors={errors.paidDate ? [errors.paidDate] : undefined} />
             </Field>
 
             <Field>

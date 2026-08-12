@@ -4,7 +4,7 @@ export function getExpenses(householdId: string) {
   return prisma.expense.findMany({
     where: { householdId },
     include: { category: true },
-    orderBy: { date: "desc" },
+    orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }],
   });
 }
 

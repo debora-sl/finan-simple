@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { protectedActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { amountToCents } from "@/lib/money";
+import { parseCalendarDate } from "@/lib/date";
 import { updateExpenseSchema } from "@/lib/validation/expense";
 import { getActiveHousehold } from "@/lib/active-household";
 
@@ -36,12 +37,19 @@ export const updateExpense = protectedActionClient
       data: {
         description: parsedInput.description,
         amountInCents: amountToCents(parsedInput.amount),
-        date: parsedInput.date,
+        dueDate:
+          parsedInput.hasNoDueDate || !parsedInput.dueDate
+            ? null
+            : parseCalendarDate(parsedInput.dueDate),
+        paidDate: parsedInput.paidDate
+          ? parseCalendarDate(parsedInput.paidDate)
+          : null,
         categoryId: parsedInput.categoryId ?? null,
       },
     });
 
     revalidatePath("/expenses");
+    revalidatePath("/dashboard");
 
     return updated;
   });

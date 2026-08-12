@@ -89,20 +89,20 @@ model Category {
 }
 
 model Expense {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   description   String
   amountInCents Int
-  date          DateTime
-  isPaid        Boolean  @default(false)
+  dueDate       DateTime? @db.Date
+  paidDate      DateTime? @db.Date
   categoryId    String?
   householdId   String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
   category  Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
-  @@index([householdId, date])
+  @@index([householdId, dueDate])
   @@index([householdId, categoryId])
   @@map("expense")
 }

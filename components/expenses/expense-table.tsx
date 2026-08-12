@@ -8,6 +8,7 @@ import { deleteExpense } from "@/actions/delete-expense";
 import { toggleExpensePaid } from "@/actions/toggle-expense-paid";
 import { useActionErrorHandler } from "@/lib/action-error";
 import { formatCentsAsCurrency } from "@/lib/money";
+import { formatCalendarDate } from "@/lib/date";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -21,19 +22,25 @@ import {
 } from "@/components/ui/table";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 
-const dateFormatter = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
-
 type Category = { id: string; name: string };
 
 type ExpenseRow = {
   id: string;
   description: string;
   amountInCents: number;
-  date: Date;
-  isPaid: boolean;
+  dueDate: Date | null;
+  paidDate: Date | null;
   categoryId: string | null;
   category: Category | null;
 };
+
+function getLocalToday(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 export function ExpenseTable({
   expenses,
@@ -68,7 +75,7 @@ export function ExpenseTable({
         <TableRow>
           <TableHead>Descrição</TableHead>
           <TableHead>Categoria</TableHead>
-          <TableHead>Data</TableHead>
+          <TableHead>Vencimento</TableHead>
           <TableHead className="text-right">Valor</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="w-0" />
@@ -87,22 +94,41 @@ export function ExpenseTable({
                 <span className="text-sm text-muted-foreground">Sem categoria</span>
               )}
             </TableCell>
-            <TableCell>{dateFormatter.format(new Date(expense.date))}</TableCell>
+            <TableCell>
+              {expense.dueDate ? (
+                formatCalendarDate(new Date(expense.dueDate))
+              ) : (
+                <span className="text-sm text-muted-foreground">Sem vencimento</span>
+              )}
+            </TableCell>
             <TableCell className="cf-money text-right font-semibold text-foreground">
               {formatCentsAsCurrency(expense.amountInCents)}
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
                 <Switch
-                  checked={expense.isPaid}
+                  checked={expense.paidDate != null}
                   onCheckedChange={(checked) =>
-                    togglePaid({ id: expense.id, isPaid: checked })
+                    togglePaid({
+                      id: expense.id,
+                      isPaid: checked,
+                      clientToday: getLocalToday(),
+                    })
                   }
-                  aria-label={expense.isPaid ? "Marcar como pendente" : "Marcar como paga"}
+                  aria-label={
+                    expense.paidDate != null ? "Marcar como pendente" : "Marcar como paga"
+                  }
                 />
-                <Badge variant={expense.isPaid ? "default" : "secondary"}>
-                  {expense.isPaid ? "Paga" : "Pendente"}
-                </Badge>
+                <div className="flex flex-col">
+                  <Badge variant={expense.paidDate != null ? "default" : "secondary"}>
+                    {expense.paidDate != null ? "Paga" : "Pendente"}
+                  </Badge>
+                  {expense.paidDate ? (
+                    <span className="text-xs text-muted-foreground">
+                      {formatCalendarDate(new Date(expense.paidDate))}
+                    </span>
+                  ) : null}
+                </div>
               </div>
             </TableCell>
             <TableCell>
