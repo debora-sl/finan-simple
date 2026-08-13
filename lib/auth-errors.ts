@@ -4,6 +4,8 @@ const CODE_MESSAGES: Record<string, string> = {
   USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "Já existe uma conta com este e-mail.",
   EMAIL_NOT_VERIFIED: "Sua conta ainda não foi verificada. Verifique seu e-mail para continuar.",
   SESSION_EXPIRED: "Sua sessão expirou. Faça login novamente.",
+  PASSWORD_TOO_SHORT: "A senha deve ter ao menos 8 caracteres.",
+  PASSWORD_TOO_LONG: "A senha deve ter no máximo 128 caracteres.",
 };
 
 const STATUS_MESSAGES: Record<number, string> = {
