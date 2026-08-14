@@ -26,10 +26,11 @@ model User {
 }
 
 model Household {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  savingsInCents Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   memberships    Membership[]
   invitations    Invitation[]

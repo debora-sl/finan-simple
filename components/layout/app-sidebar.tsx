@@ -30,6 +30,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/expenses", label: "Despesas", icon: Receipt },
   { href: "/categories", label: "Categorias", icon: Tag },
+  { href: "/cofrinho", label: "Cofrinho", icon: PiggyBank },
   { href: "/households", label: "Residência", icon: Home },
 ];
 

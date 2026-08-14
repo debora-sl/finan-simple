@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, Wallet } from "lucide-react";
+import { CheckCircle2, Clock, PiggyBank, Wallet } from "lucide-react";
 
 import { formatCentsAsCurrency } from "@/lib/money";
 import { cn } from "@/lib/utils";
@@ -49,16 +49,19 @@ export function SummaryCards({
   totalInCents,
   paidInCents,
   pendingInCents,
+  savingsInCents,
 }: {
   totalInCents: number;
   paidInCents: number;
   pendingInCents: number;
+  savingsInCents: number;
 }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <SummaryTile label="Total Despesas" valueInCents={totalInCents} tone="action" icon={Wallet} />
       <SummaryTile label="Pago" valueInCents={paidInCents} tone="positive" icon={CheckCircle2} />
       <SummaryTile label="Pendente" valueInCents={pendingInCents} tone="warning" icon={Clock} />
+      <SummaryTile label="Cofrinho" valueInCents={savingsInCents} tone="positive" icon={PiggyBank} />
     </div>
   );
 }
