@@ -11,7 +11,7 @@ import { CategoryForm } from "@/components/categories/category-form";
 import { CategoryIcon } from "@/components/categories/category-icon";
 import { ConfirmDeleteButton } from "@/components/shared/confirm-delete-button";
 
-type Category = { id: string; name: string };
+type Category = { id: string; name: string; color?: string | null };
 
 export function CategoryList({ categories }: { categories: Category[] }) {
   const { execute: removeCategory } = useAction(deleteCategory, {
@@ -38,7 +38,7 @@ export function CategoryList({ categories }: { categories: Category[] }) {
           className="flex items-center justify-between gap-4 px-4 py-3"
         >
           <div className="flex items-center gap-3">
-            <CategoryIcon id={category.id} />
+            <CategoryIcon id={category.id} color={category.color} />
             <span className="text-sm font-medium text-foreground">{category.name}</span>
           </div>
           <div className="flex items-center gap-1">

@@ -1,31 +1,18 @@
 import { Tag } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { categoryColorVar, resolveCategoryColor } from "@/lib/category-colors";
 
-const CATEGORY_COLORS = [
-  "moradia",
-  "mercado",
-  "transporte",
-  "saude",
-  "educacao",
-  "lazer",
-  "cartao",
-  "fixas",
-  "outros",
-] as const;
-
-export function pickCategoryColor(seed: string) {
-  let hash = 0;
-
-  for (let index = 0; index < seed.length; index += 1) {
-    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
-  }
-
-  return CATEGORY_COLORS[hash % CATEGORY_COLORS.length];
-}
-
-export function CategoryIcon({ id, className }: { id: string; className?: string }) {
-  const color = pickCategoryColor(id);
+export function CategoryIcon({
+  id,
+  color,
+  className,
+}: {
+  id: string;
+  color?: string | null;
+  className?: string;
+}) {
+  const slug = resolveCategoryColor({ id, color });
 
   return (
     <span
@@ -34,8 +21,8 @@ export function CategoryIcon({ id, className }: { id: string; className?: string
         className
       )}
       style={{
-        backgroundColor: `color-mix(in srgb, var(--cat-${color}) 14%, transparent)`,
-        color: `var(--cat-${color})`,
+        backgroundColor: `color-mix(in srgb, ${categoryColorVar(slug)} 14%, transparent)`,
+        color: categoryColorVar(slug),
       }}
     >
       <Tag className="size-4" />

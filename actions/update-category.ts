@@ -27,11 +27,13 @@ export const updateCategory = protectedActionClient
         data: {
           name: parsedInput.name,
           nameLower: parsedInput.name.toLowerCase(),
+          color: parsedInput.color ?? null,
         },
       });
 
       revalidatePath("/categories");
       revalidatePath("/expenses");
+      revalidatePath("/dashboard");
 
       return updated;
     } catch (error) {

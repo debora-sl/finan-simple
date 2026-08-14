@@ -19,11 +19,13 @@ export const createCategory = protectedActionClient
           name: parsedInput.name,
           nameLower: parsedInput.name.toLowerCase(),
           householdId,
+          color: parsedInput.color ?? null,
         },
       });
 
       revalidatePath("/categories");
       revalidatePath("/expenses");
+      revalidatePath("/dashboard");
 
       return category;
     } catch (error) {

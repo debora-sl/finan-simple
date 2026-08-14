@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
+import type { z } from "zod";
 
 import { createCategory } from "@/actions/create-category";
 import { updateCategory } from "@/actions/update-category";
 import { useActionErrorHandler } from "@/lib/action-error";
-import { categorySchema, type CategoryInput } from "@/lib/validation/category";
+import { createCategorySchema } from "@/lib/validation/category";
+import type { CategoryColorSlug } from "@/lib/category-colors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CategoryColorPicker } from "@/components/categories/category-color-picker";
 import {
   Dialog,
   DialogClose,
@@ -23,7 +26,8 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-type CategoryRecord = { id: string; name: string };
+type CategoryRecord = { id: string; name: string; color?: string | null };
+type CategoryFormValues = z.infer<typeof createCategorySchema>;
 
 export function CategoryForm({
   category,
@@ -39,15 +43,22 @@ export function CategoryForm({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
-  } = useForm<CategoryInput>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: { name: category?.name ?? "" },
+  } = useForm<CategoryFormValues>({
+    resolver: zodResolver(createCategorySchema),
+    defaultValues: {
+      name: category?.name ?? "",
+      color: (category?.color as CategoryColorSlug | null | undefined) ?? undefined,
+    },
   });
 
   useEffect(() => {
     if (open) {
-      reset({ name: category?.name ?? "" });
+      reset({
+        name: category?.name ?? "",
+        color: (category?.color as CategoryColorSlug | null | undefined) ?? undefined,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -64,7 +75,7 @@ export function CategoryForm({
   const updateAction = useAction(updateCategory, actionOptions);
   const isPending = isEdit ? updateAction.isPending : createAction.isPending;
 
-  function onSubmit(values: CategoryInput) {
+  function onSubmit(values: CategoryFormValues) {
     if (isEdit) {
       updateAction.execute({ id: category.id, ...values });
     } else {
@@ -91,6 +102,17 @@ export function CategoryForm({
                 {...register("name")}
               />
               <FieldError errors={errors.name ? [errors.name] : undefined} />
+            </Field>
+
+            <Field>
+              <FieldLabel>Cor</FieldLabel>
+              <Controller
+                name="color"
+                control={control}
+                render={({ field }) => (
+                  <CategoryColorPicker value={field.value} onChange={field.onChange} />
+                )}
+              />
             </Field>
           </FieldGroup>
         </form>

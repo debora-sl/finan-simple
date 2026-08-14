@@ -8,6 +8,7 @@ export type DashboardSummary = {
   byCategory: Array<{
     categoryId: string | null;
     categoryName: string;
+    categoryColor: string | null;
     totalInCents: number;
   }>;
 };
@@ -28,21 +29,27 @@ export async function getDashboardSummary(householdId: string): Promise<Dashboar
       where: { householdId },
       _sum: { amountInCents: true },
     }),
-    prisma.category.findMany({ where: { householdId }, select: { id: true, name: true } }),
+    prisma.category.findMany({
+      where: { householdId },
+      select: { id: true, name: true, color: true },
+    }),
   ]);
 
-  const categoryNames = new Map(categories.map((category) => [category.id, category.name]));
+  const categoriesById = new Map(categories.map((category) => [category.id, category]));
   const totalInCents = totalAgg._sum.amountInCents ?? 0;
   const paidInCents = paidAgg._sum.amountInCents ?? 0;
 
   const byCategory = byCategoryGroups
-    .map((group) => ({
-      categoryId: group.categoryId,
-      categoryName: group.categoryId
-        ? (categoryNames.get(group.categoryId) ?? "Sem categoria")
-        : "Sem categoria",
-      totalInCents: group._sum.amountInCents ?? 0,
-    }))
+    .map((group) => {
+      const category = group.categoryId ? categoriesById.get(group.categoryId) : undefined;
+
+      return {
+        categoryId: group.categoryId,
+        categoryName: category?.name ?? "Sem categoria",
+        categoryColor: category?.color ?? null,
+        totalInCents: group._sum.amountInCents ?? 0,
+      };
+    })
     .sort((a, b) => b.totalInCents - a.totalInCents);
 
   return {

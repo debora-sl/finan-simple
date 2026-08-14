@@ -3,7 +3,7 @@
 import { Cell, Pie, PieChart } from "recharts";
 
 import { formatCentsAsCurrency } from "@/lib/money";
-import { pickCategoryColor } from "@/components/categories/category-icon";
+import { categoryColorVar, pickCategoryColor, resolveCategoryColor } from "@/lib/category-colors";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
@@ -15,6 +15,7 @@ import {
 type CategoryTotal = {
   categoryId: string | null;
   categoryName: string;
+  categoryColor: string | null;
   totalInCents: number;
 };
 
@@ -29,7 +30,11 @@ export function CategoryBreakdown({
     key: item.categoryId ?? "sem-categoria",
     name: item.categoryName,
     value: item.totalInCents,
-    color: `var(--cat-${pickCategoryColor(item.categoryId ?? item.categoryName)})`,
+    color: categoryColorVar(
+      item.categoryId
+        ? resolveCategoryColor({ id: item.categoryId, color: item.categoryColor })
+        : pickCategoryColor(item.categoryName)
+    ),
   }));
 
   const chartConfig = Object.fromEntries(
