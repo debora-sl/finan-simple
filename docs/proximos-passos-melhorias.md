@@ -11,9 +11,14 @@
 - Banco migrado para **Neon Postgres** (adapter `@prisma/adapter-neon`); migration `20260810033842_init` aplicada em produção.
 - Autenticação (Better Auth) validada em produção.
 - **Spec 005** (datas em Despesas — backlog itens 7 e 8) concluída e em produção.
-- Ajustes pontuais pós-deploy concluídos: itens 9, 3 e 5. O item 2 foi **tentado mas não resolveu** (ver abaixo).
+- **Spec 006** (regras de senha no cadastro), **Spec 007** (Cofrinho) e **Spec 008** (cor da categoria)
+  concluídas (ver histórico do git). O item 2 (botão "+ criar nova residência" cortado) fica **superado**
+  pela spec 009, que remove o `HouseholdSwitcher` da sidebar.
+- Ajustes pontuais pós-deploy concluídos: itens 9, 3 e 5.
 - **Spec 004** (refinamentos pré-deploy) concluída 39/39, incluindo o T038 (validação manual em produção).
 - Specs anteriores concluídas: 001 (despesas), 002 (tema), 003 (households).
+- **Próximas na fila (novas):** spec 009 (Residências: menu/listagem/edição) — **ativa em `PROMPT.md`** — e
+  spec 010 (Dashboard por mês). Detalhamento completo abaixo.
 
 ## Como cada melhoria será tratada
 
@@ -44,40 +49,82 @@ shadcn/ui como única lib de componentes; cores só via tokens de `app/globals.c
 | 7   | Datas em Despesas: vencimento, pagamento e "sem data de vencimento"                | `spec`   | Alta       | Incluir Data de Vencimento, Data do Pagamento e a opção "Sem data de vencimento". **Absorve o antigo #8** (correção do bug de timezone) por mexerem no mesmo tratamento de datas.  |
 | 8   | ~~Corrigir Data de Vencimento aparecendo um dia antes~~ (absorvido pelo #7)         | `spec`   | Alta       | Bug de timezone/UTC: ao cadastrar 20/08/2026 a lista mostra 19/08/2026. Corrigir para exibir a data exatamente como informada — tratado dentro da spec do #7.                       |
 | 9   | Confirmação de exclusão em Despesas e Categorias                                    | `ajuste` | Alta       | Antes de excluir uma despesa ou categoria, pedir confirmação ao usuário (`AlertDialog` do shadcn/ui).                                                                             |
+| 10  | Residências: tirar lista/criação do menu e criar página de listagem + edição por residência | `spec`   | Alta       | **Spec 009 (ativa).** Remove o `HouseholdSwitcher` da sidebar; `/households` vira lista de todas as residências (definir ativa + editar + criar), e o detalhe atual vira `/households/[id]`. Autorização pela residência da rota (só admin edita/exclui). **Sem migration.** Dobra as sugestões: residência ativa no `AppHeader`, ativa destacada no topo, estado de primeiro acesso, `aria-label` nos botões só-ícone. Detalhamento em `PROMPT.md`. |
+| 11  | Dashboard: relatórios por mês                                                       | `spec`   | Média      | **Spec 010.** Seletor de mês no Dashboard filtrando total/pago/pendente/gráfico por `dueDate`; meses disponíveis via `data/`. **Sem migration.** Dobra a sugestão: aplicar o mesmo filtro de mês na página de Despesas para consistência. Detalhamento abaixo em "Detalhamento das próximas specs". |
 
 ## Sequência de execução acordada
 
 > Ordem combinada para retomar o trabalho (inclusive após um `clear` do chat). Seguir de cima para baixo.
-> Atualizado em 2026-08-12. **Pendências abaixo (passos 3 a 6) — é aqui que um chat novo deve começar.**
+> Atualizado em 2026-08-18. **Pendências abaixo (passos 3 e 4) — é aqui que um chat novo deve começar.**
 
-1. ~~**Spec 005 — Datas em Despesas (backlog item 7)**: concluir o fluxo Spec Kit.~~ **Concluída** —
-   fluxo Spec Kit completo (`/speckit-specify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-implement`),
-   código implementado. Absorveu o backlog item 8 (bug de data um dia antes).
-2. ~~**Ajustes diretos (sem spec), após concluir a spec 005**~~ — três dos quatro concluídos:
-   1. ~~**Item 9** — Confirmação de exclusão em Despesas e Categorias (Alta).~~ ✅
-   2. ~~**Item 3** — "Total" → "Total Despesas" no Dashboard (Baixa).~~ ✅
-   3. ~~**Item 5** — Formatar valores do gráfico em R$ (Baixa).~~ ✅
-   4. **Item 2** — Botão "+ criar nova residência" cortado em telas maiores (Baixa). ⚠️ **Reaberto** —
-      a tentativa não resolveu (segue no passo 3).
+1. ~~**Spec 005 — Datas em Despesas (backlog item 7)**~~ **Concluída** — absorveu o item 8 (bug de data).
+2. ~~**Ajustes diretos + specs 006/007/008**~~ — **concluídos**:
+   1. ~~**Item 9** — Confirmação de exclusão em Despesas e Categorias.~~ ✅
+   2. ~~**Item 3** — "Total" → "Total Despesas" no Dashboard.~~ ✅
+   3. ~~**Item 5** — Formatar valores do gráfico em R$.~~ ✅
+   4. ~~**Spec 006** — Regras de senha no cadastro.~~ ✅
+   5. ~~**Spec 007** — Cofrinho.~~ ✅
+   6. ~~**Spec 008** — Cor da categoria.~~ ✅
+   7. **Item 2** — Botão "+ criar nova residência" cortado. ⚠️ **Superado pela spec 009**, que remove o
+      `HouseholdSwitcher` da sidebar (o botão problemático deixa de existir ali).
 
 ### Pendente (retomar aqui)
 
-3. **Refazer o item 2 — botão "+ criar nova residência" cortado em telas maiores** (`ajuste`, Baixa).
-   A 1ª tentativa (`alignItemWithTrigger={false}` no `SelectContent` de `components/layout/household-switcher.tsx`)
-   **não resolveu** — validado manualmente em produção, o botão continua cortado ao clicar em telas maiores.
-   É Base UI Select (não Radix). Reproduzir o corte primeiro e investigar largura do popup (`--anchor-width`),
-   `side`/`align` do `SelectContent` e overflow do container antes de aplicar.
-4. **Spec 006 — Regras de senha no cadastro** (`spec`, Alta). Mostrar as regras de senha ao usuário na tela
-   de cadastro. **Antes do `/speckit-specify`**, checar a config atual de senha do Better Auth pra a spec não
-   conflitar com o padrão já configurado.
-5. **Spec 007 — Cofrinho** (`spec`, Alta). Feature completa: nova opção no menu, tela para cadastrar o valor
-   guardado pela família e card no Dashboard com o total. Envolve **model novo** no Prisma (migration).
-6. **Spec 008 — Cor da categoria** (`spec`, Baixa). Em Categorias, permitir escolher a cor. Envolve **campo
-   novo** em `Category` (migration).
+3. **Spec 009 — Residências: menu, listagem e edição por residência** (`spec`, Alta). **Ativa em `PROMPT.md`.**
+   Remove o `HouseholdSwitcher` da sidebar; `/households` vira a lista de todas as residências (definir ativa,
+   editar, criar) e o detalhe atual vira `/households/[id]`, com autorização pela residência da rota. **Sem
+   migration.** Dobra as sugestões de UX (residência ativa no `AppHeader`, ativa destacada, primeiro acesso,
+   acessibilidade dos botões só-ícone). Detalhamento completo em `PROMPT.md`.
+4. **Spec 010 — Dashboard: relatórios por mês** (`spec`, Média). Seletor de mês filtrando os relatórios por
+   `dueDate`; meses disponíveis via `data/`. **Sem migration.** Dobra a sugestão de aplicar o mesmo filtro na
+   página de Despesas. Detalhamento em "Detalhamento das próximas specs" abaixo.
 
-As três specs são independentes (sem domínio em comum). Cada uma vai **isolada** pelo fluxo Spec Kit completo
+As duas specs são independentes (sem domínio em comum). Cada uma vai **isolada** pelo fluxo Spec Kit completo
 (`/speckit-specify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-implement`) e em PR próprio — **não bundlar
-numa spec só**. Ordem por prioridade: 006 e 007 (Alta) antes de 008 (Baixa).
+numa spec só**. Ordem: 009 (Alta) antes de 010 (Média). Ao iniciar a 010, mover seu bloco de detalhamento para
+`PROMPT.md`.
+
+## Detalhamento das próximas specs
+
+### Spec 009 — Residências (ativa)
+
+O bloco pronto para `/speckit-specify` está em `PROMPT.md`. Resumo do escopo: sidebar sem `HouseholdSwitcher`;
+residência ativa no `AppHeader`; `/households` como lista (definir ativa + editar + criar, ativa destacada no
+topo, tratamento de primeiro acesso, botões só-ícone com `aria-label`); `/households/[id]` com o conteúdo atual
+de Residência, autorizando pela residência da rota (só ADMIN edita nome/convites/exclui; qualquer membro sai);
+leitura via `data/`; `revalidatePath` e navegação corretos. Sem migration.
+
+### Spec 010 — Dashboard: relatórios por mês (próxima)
+
+Adiciona ao Dashboard a opção de **filtrar/mostrar os relatórios por mês**. Hoje o Dashboard
+(`app/(app)/dashboard/page.tsx`) sempre agrega **todas** as despesas da residência ativa, sem recorte temporal.
+
+Contexto atual (já verificado):
+
+- `data/dashboard.ts` (`getDashboardSummary(householdId)`) agrega total, pago, pendente e distribuição por
+  categoria de **todas** as despesas, sem filtro de data.
+- A despesa (`Expense` em `prisma/schema.prisma`) tem `dueDate` e `paidDate` como `DateTime? @db.Date` (ambos
+  **nullable**), com índice `@@index([householdId, dueDate])`. Datas de despesa vieram da spec 005.
+- A UI usa `SummaryCards` e `CategoryBreakdown`; o cofrinho (`getHouseholdSavings`) é saldo acumulado, não mensal.
+- A página de Despesas (`app/(app)/expenses/page.tsx` + `data/expenses.ts`) também lista tudo sem recorte de mês.
+
+O que a spec precisa definir:
+
+- **Seletor de mês**: controle (shadcn `Select` ou similar) que lista os meses disponíveis e escolhe o mês do
+  relatório. Definir o campo de referência (`dueDate` como mês da despesa) e o padrão inicial (mês atual ou
+  "Todos"). Decidir o tratamento de despesas **sem `dueDate`** (bucket "Sem data" / fora do recorte) e documentar.
+- **Meses disponíveis via `data/`**: expor em `data/dashboard.ts` a lista de meses com despesas na residência
+  (para popular o seletor), sem chamar Prisma de componente.
+- **Agregação por mês**: `getDashboardSummary` passa a aceitar o mês/intervalo e filtra total, pago, pendente e
+  distribuição por categoria por esse recorte, sem quebrar os consumidores atuais. Refletir em `SummaryCards` e
+  `CategoryBreakdown`.
+- **Estados vazios**: manter o "nenhuma despesa" já existente, agora coerente com o mês selecionado.
+- **Cofrinho**: decidir explicitamente se o card é afetado pelo mês (recomendação: não, por ser saldo acumulado).
+- **Consistência com Despesas (sugestão dobrada)**: aplicar o **mesmo filtro de mês na página de Despesas**,
+  reutilizando o seletor e a lógica de recorte, para o usuário ter a mesma experiência nos dois lugares.
+
+Fora de escopo: comparação entre meses/série temporal; exportação de relatório; migration; filtro por intervalo
+customizado (só recorte por mês).
 
 ## Em andamento
 
@@ -94,6 +141,11 @@ _(vazio)_
 - **Item 3 — "Total" → "Total Despesas"** no Dashboard (`components/dashboard/summary-cards.tsx`).
 - **Item 5 — Valores do gráfico em R$**: `formatter` no tooltip do gráfico de categorias
   (`components/dashboard/category-breakdown.tsx`) usando `formatCentsAsCurrency`.
-- ~~**Item 2 — Botão "Criar nova residência" cortado em telas maiores**~~: ⚠️ **reaberto**. Aplicado
-  `alignItemWithTrigger={false}` no `SelectContent` do `components/layout/household-switcher.tsx`, mas a validação
-  manual em produção mostrou que o corte persiste. Voltou para a "Sequência de execução acordada" (passo 3).
+- **Spec 006 — Regras de senha no cadastro** → mostra as regras de senha na tela de cadastro
+  (`components/auth/password-requirements.tsx`).
+- **Spec 007 — Cofrinho** → nova opção no menu, tela de cadastro do valor guardado e card no Dashboard; model
+  novo no Prisma (`savings`).
+- **Spec 008 — Cor da categoria** → `specs/008-category-color/`; paleta central em `lib/category-colors.ts`,
+  campo `color` nullable em `Category` com fallback derivado.
+- ~~**Item 2 — Botão "Criar nova residência" cortado em telas maiores**~~: **superado pela spec 009**, que
+  remove o `HouseholdSwitcher` da sidebar — o botão problemático deixa de existir naquele contexto.
