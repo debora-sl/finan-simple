@@ -5,14 +5,15 @@ import { revalidatePath } from "next/cache";
 import { protectedActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { inviteMemberSchema } from "@/lib/validation/invitation";
-import { getActiveHousehold } from "@/lib/active-household";
+import { getMembership } from "@/data/households";
 
 export const inviteMember = protectedActionClient
   .inputSchema(inviteMemberSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { householdId, role } = await getActiveHousehold();
+    const { householdId } = parsedInput;
+    const membership = await getMembership(ctx.user.id, householdId);
 
-    if (role !== "ADMIN") {
+    if (membership?.role !== "ADMIN") {
       throw new Error("Apenas o Administrador pode convidar membros.");
     }
 
@@ -35,11 +36,11 @@ export const inviteMember = protectedActionClient
       );
     }
 
-    const membership = await prisma.membership.findUnique({
+    const invitedMembership = await prisma.membership.findUnique({
       where: { userId_householdId: { userId: invitedUser.id, householdId } },
     });
 
-    if (membership) {
+    if (invitedMembership) {
       throw new Error("Esse e-mail já pertence a um membro da residência.");
     }
 
@@ -62,4 +63,5 @@ export const inviteMember = protectedActionClient
     }
 
     revalidatePath("/households");
+    revalidatePath(`/households/${householdId}`);
   });

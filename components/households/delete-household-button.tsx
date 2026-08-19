@@ -32,7 +32,7 @@ export function DeleteHouseholdButton({
   const { execute, isPending } = useAction(deleteHousehold, {
     onSuccess: () => {
       toast.success("Residência excluída.");
-      router.push("/dashboard");
+      router.push("/households");
     },
     onError: useActionErrorHandler("Não foi possível excluir a residência."),
   });

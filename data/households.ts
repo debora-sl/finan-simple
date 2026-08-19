@@ -10,8 +10,34 @@ export async function getHouseholdsForUser(userId: string) {
   return memberships.map((membership) => ({
     id: membership.household.id,
     name: membership.household.name,
-    role: membership.role,
+    role: membership.role as "ADMIN" | "MEMBER",
   }));
+}
+
+export async function getActiveHouseholdId(userId: string): Promise<string | null> {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: { activeHouseholdId: true },
+  });
+
+  return user.activeHouseholdId;
+}
+
+export async function getHouseholdForUserWithRole(userId: string, householdId: string) {
+  const membership = await prisma.membership.findUnique({
+    where: { userId_householdId: { userId, householdId } },
+    include: { household: true },
+  });
+
+  if (!membership) {
+    return null;
+  }
+
+  return {
+    id: membership.household.id,
+    name: membership.household.name,
+    role: membership.role as "ADMIN" | "MEMBER",
+  };
 }
 
 export function getHouseholdById(householdId: string) {

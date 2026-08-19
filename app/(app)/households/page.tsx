@@ -1,96 +1,49 @@
-import { getActiveHousehold } from "@/lib/active-household";
-import { getHouseholdById } from "@/data/households";
-import { getHouseholdInvitations, getMembers } from "@/data/memberships";
-import { InviteForm } from "@/components/households/invite-form";
-import { MembersTable } from "@/components/households/members-table";
-import { InvitationsList } from "@/components/households/invitations-list";
-import { HouseholdNameForm } from "@/components/households/household-name-form";
-import { LeaveHouseholdButton } from "@/components/households/leave-household-button";
-import { DeleteHouseholdButton } from "@/components/households/delete-household-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { Plus } from "lucide-react";
+
+import { getCurrentUser } from "@/lib/dal";
+import { getActiveHouseholdId, getHouseholdsForUser } from "@/data/households";
+import { HouseholdsList } from "@/components/households/households-list";
+import { Button } from "@/components/ui/button";
 
 export default async function HouseholdsPage() {
-  const { userId, householdId, role } = await getActiveHousehold();
+  const currentUser = await getCurrentUser();
 
-  const [household, members, invitations] = await Promise.all([
-    getHouseholdById(householdId),
-    getMembers(householdId),
-    getHouseholdInvitations(householdId),
+  const [activeHouseholdId, households] = await Promise.all([
+    getActiveHouseholdId(currentUser.id),
+    getHouseholdsForUser(currentUser.id),
   ]);
-
-  const isAdmin = role === "ADMIN";
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {household?.name}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Gerencie os membros e convites da sua residência.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Residência</h1>
+          <p className="text-sm text-muted-foreground">
+            Gerencie as residências das quais você participa.
+          </p>
+        </div>
+        <Button nativeButton={false} render={<Link href="/households/new" />}>
+          <Plus />
+          Criar nova residência
+        </Button>
       </div>
 
-      {isAdmin && household && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Nome da residência</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <HouseholdNameForm id={household.id} name={household.name} />
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Membros</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MembersTable members={members} currentUserId={userId} isAdmin={isAdmin} />
-        </CardContent>
-      </Card>
-
-      {isAdmin && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Convidar membro</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <InviteForm />
-          </CardContent>
-        </Card>
-      )}
-
-      {isAdmin && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Convites</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <InvitationsList invitations={invitations} />
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Sair da residência</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <LeaveHouseholdButton householdId={householdId} />
-        </CardContent>
-      </Card>
-
-      {isAdmin && household && (
-        <Card className="border-destructive/50">
-          <CardHeader>
-            <CardTitle>Zona de perigo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DeleteHouseholdButton householdId={household.id} householdName={household.name} />
-          </CardContent>
-        </Card>
+      {households.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border py-16 text-center">
+          <div>
+            <p className="text-sm font-medium text-foreground">Nenhuma residência encontrada</p>
+            <p className="text-sm text-muted-foreground">
+              Crie uma residência para começar a organizar suas despesas.
+            </p>
+          </div>
+          <Button nativeButton={false} render={<Link href="/households/new" />}>
+            <Plus />
+            Criar nova residência
+          </Button>
+        </div>
+      ) : (
+        <HouseholdsList households={households} activeHouseholdId={activeHouseholdId} />
       )}
     </div>
   );

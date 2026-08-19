@@ -24,7 +24,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { HouseholdSwitcher } from "@/components/layout/household-switcher";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -34,15 +33,11 @@ const NAV_ITEMS = [
   { href: "/households", label: "Residência", icon: Home },
 ];
 
-type HouseholdSummary = { id: string; name: string; role: string };
-
 type SidebarContentProps = {
-  households: HouseholdSummary[];
-  activeHouseholdId: string;
   onNavigate?: () => void;
 };
 
-function SidebarContent({ households, activeHouseholdId, onNavigate }: SidebarContentProps) {
+function SidebarContent({ onNavigate }: SidebarContentProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -59,8 +54,6 @@ function SidebarContent({ households, activeHouseholdId, onNavigate }: SidebarCo
         </span>
         <p className="text-sm font-bold text-foreground">Controle</p>
       </div>
-
-      <HouseholdSwitcher households={households} activeHouseholdId={activeHouseholdId} />
 
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
@@ -115,27 +108,15 @@ function SidebarContent({ households, activeHouseholdId, onNavigate }: SidebarCo
   );
 }
 
-export function AppSidebar({
-  households,
-  activeHouseholdId,
-}: {
-  households: HouseholdSummary[];
-  activeHouseholdId: string;
-}) {
+export function AppSidebar() {
   return (
     <aside className="hidden w-60 shrink-0 border-r border-border bg-card lg:flex">
-      <SidebarContent households={households} activeHouseholdId={activeHouseholdId} />
+      <SidebarContent />
     </aside>
   );
 }
 
-export function AppSidebarMobileNav({
-  households,
-  activeHouseholdId,
-}: {
-  households: HouseholdSummary[];
-  activeHouseholdId: string;
-}) {
+export function AppSidebarMobileNav() {
   const [open, setOpen] = useState(false);
 
   return (
@@ -146,11 +127,7 @@ export function AppSidebarMobileNav({
       </SheetTrigger>
       <SheetContent side="left" className="w-72 p-0">
         <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
-        <SidebarContent
-          households={households}
-          activeHouseholdId={activeHouseholdId}
-          onNavigate={() => setOpen(false)}
-        />
+        <SidebarContent onNavigate={() => setOpen(false)} />
       </SheetContent>
     </Sheet>
   );

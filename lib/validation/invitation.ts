@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const inviteMemberSchema = z.object({
+  householdId: z.string().min(1),
   email: z.string().trim().toLowerCase().pipe(z.email("E-mail inválido")),
 });
 

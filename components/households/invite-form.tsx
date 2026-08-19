@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 
-export function InviteForm() {
+export function InviteForm({ householdId }: { householdId: string }) {
   const {
     register,
     handleSubmit,
@@ -20,6 +20,7 @@ export function InviteForm() {
     formState: { errors },
   } = useForm<InviteMemberInput>({
     resolver: zodResolver(inviteMemberSchema),
+    defaultValues: { householdId, email: "" },
   });
 
   const { execute, isPending } = useAction(inviteMember, {
@@ -40,6 +41,7 @@ export function InviteForm() {
       noValidate
       className="flex items-start gap-3"
     >
+      <input type="hidden" {...register("householdId")} />
       <Field data-invalid={!!errors.email} className="flex-1">
         <FieldLabel htmlFor="invite-email">Convidar por e-mail</FieldLabel>
         <Input

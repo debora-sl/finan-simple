@@ -27,7 +27,7 @@ export function LeaveHouseholdButton({ householdId }: { householdId: string }) {
     onSuccess: () => {
       toast.success("Você saiu da residência.");
       setOpen(false);
-      router.push("/dashboard");
+      router.push("/households");
     },
     onError: useActionErrorHandler("Não foi possível sair da residência."),
   });
