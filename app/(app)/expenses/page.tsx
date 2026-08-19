@@ -1,17 +1,25 @@
 import { Plus } from "lucide-react";
 
 import { getActiveHousehold } from "@/lib/active-household";
-import { getExpenses } from "@/data/expenses";
+import { resolveReportPeriod, periodToValue } from "@/lib/report-period";
+import { getExpenses, getAvailableMonths } from "@/data/expenses";
 import { getCategories } from "@/data/categories";
 import { Button } from "@/components/ui/button";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 import { ExpenseTable } from "@/components/expenses/expense-table";
+import { MonthSelector } from "@/components/shared/month-selector";
 
-export default async function ExpensesPage() {
+type ExpensesPageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function ExpensesPage({ searchParams }: ExpensesPageProps) {
   const { householdId } = await getActiveHousehold();
-  const [expenses, categories] = await Promise.all([
-    getExpenses(householdId),
+  const period = resolveReportPeriod((await searchParams).month);
+  const [expenses, categories, months] = await Promise.all([
+    getExpenses(householdId, period),
     getCategories(householdId),
+    getAvailableMonths(householdId),
   ]);
 
   return (
@@ -35,6 +43,8 @@ export default async function ExpensesPage() {
           }
         />
       </div>
+
+      <MonthSelector months={months} value={periodToValue(period)} />
 
       <ExpenseTable expenses={expenses} categories={categories} />
     </div>

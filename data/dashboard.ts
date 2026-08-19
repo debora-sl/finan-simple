@@ -1,4 +1,7 @@
+import type { Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
+import type { ReportPeriod } from "@/lib/report-period";
 
 export type DashboardSummary = {
   hasExpenses: boolean;
@@ -13,20 +16,26 @@ export type DashboardSummary = {
   }>;
 };
 
-export async function getDashboardSummary(householdId: string): Promise<DashboardSummary> {
+export async function getDashboardSummary(
+  householdId: string,
+  period?: ReportPeriod
+): Promise<DashboardSummary> {
+  const dueDateFilter: Prisma.ExpenseWhereInput =
+    period?.kind === "month" ? { dueDate: { gte: period.gte, lt: period.lt } } : {};
+
   const [totalAgg, paidAgg, byCategoryGroups, categories] = await Promise.all([
     prisma.expense.aggregate({
-      where: { householdId },
+      where: { householdId, ...dueDateFilter },
       _sum: { amountInCents: true },
       _count: true,
     }),
     prisma.expense.aggregate({
-      where: { householdId, paidDate: { not: null } },
+      where: { householdId, paidDate: { not: null }, ...dueDateFilter },
       _sum: { amountInCents: true },
     }),
     prisma.expense.groupBy({
       by: ["categoryId"],
-      where: { householdId },
+      where: { householdId, ...dueDateFilter },
       _sum: { amountInCents: true },
     }),
     prisma.category.findMany({

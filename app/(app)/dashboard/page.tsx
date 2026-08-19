@@ -1,25 +1,37 @@
 import { LayoutDashboard } from "lucide-react";
 
 import { getActiveHousehold } from "@/lib/active-household";
+import { resolveReportPeriod, periodToValue } from "@/lib/report-period";
 import { getDashboardSummary } from "@/data/dashboard";
+import { getAvailableMonths } from "@/data/expenses";
 import { getHouseholdSavings } from "@/data/savings";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { CategoryBreakdown } from "@/components/dashboard/category-breakdown";
+import { MonthSelector } from "@/components/shared/month-selector";
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const { householdId } = await getActiveHousehold();
-  const [summary, savingsInCents] = await Promise.all([
-    getDashboardSummary(householdId),
+  const period = resolveReportPeriod((await searchParams).month);
+  const [summary, savingsInCents, months] = await Promise.all([
+    getDashboardSummary(householdId, period),
     getHouseholdSavings(householdId),
+    getAvailableMonths(householdId),
   ]);
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Visão geral das suas despesas.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Visão geral das suas despesas.
+          </p>
+        </div>
+        <MonthSelector months={months} value={periodToValue(period)} />
       </div>
 
       <SummaryCards
