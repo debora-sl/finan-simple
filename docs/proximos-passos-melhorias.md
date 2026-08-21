@@ -51,6 +51,94 @@ shadcn/ui como única lib de componentes; cores só via tokens de `app/globals.c
 | 9   | Confirmação de exclusão em Despesas e Categorias                                    | `ajuste` | Alta       | Antes de excluir uma despesa ou categoria, pedir confirmação ao usuário (`AlertDialog` do shadcn/ui).                                                                             |
 | 10  | Residências: tirar lista/criação do menu e criar página de listagem + edição por residência | `spec`   | Alta       | **Spec 009 (ativa).** Remove o `HouseholdSwitcher` da sidebar; `/households` vira lista de todas as residências (definir ativa + editar + criar), e o detalhe atual vira `/households/[id]`. Autorização pela residência da rota (só admin edita/exclui). **Sem migration.** Dobra as sugestões: residência ativa no `AppHeader`, ativa destacada no topo, estado de primeiro acesso, `aria-label` nos botões só-ícone. Detalhamento em `PROMPT.md`. |
 | 11  | Dashboard: relatórios por mês                                                       | `spec`   | Média      | **Spec 010.** Seletor de mês no Dashboard filtrando total/pago/pendente/gráfico por `dueDate`; meses disponíveis via `data/`. **Sem migration.** Dobra a sugestão: aplicar o mesmo filtro de mês na página de Despesas para consistência. Detalhamento abaixo em "Detalhamento das próximas specs". |
+| 12  | Calculador de Dívidas: página no menu, total por mês e divisão por N pagantes (persistido) | `spec`   | Média      | **Novo lote.** Nova opção no menu + página onde o usuário escolhe o mês, vê o total de despesas daquele mês e informa o **número de pagantes** — que é **persistido** por `(residência, mês)` — mostrando o valor por pagante (ex.: Julho R$ 1.000,00 ÷ 3 = R$ 333,33). **Exige migration** (armazenar pagantes por mês). Base do card do Dashboard (item 13). Detalhamento em "Novo lote de melhorias". |
+| 13  | Dashboard: card "Total Pagantes"                                                    | `spec`   | Média      | **Novo lote.** Card no Dashboard exibindo o **número de pagantes que o usuário informou no Calculador** para o mês selecionado. **Depende do item 12** (lê o dado que ele grava). `SummaryCards` hoje só renderiza R$ — precisa suportar tile de contagem. Sem migration própria (usa a do 12). Detalhamento em "Novo lote de melhorias". |
+| 14  | Despesas: exibir "Total das Despesas"                                               | `ajuste` | Média      | **Novo lote.** Somar as despesas listadas e mostrar o total na página de Despesas (respeitando o filtro de mês ativo). Reusar `formatCentsAsCurrency`; cálculo/soma via `data/`. Detalhamento em "Novo lote de melhorias".            |
+
+## Novo lote de melhorias (separação Spec × Direto)
+
+> Lote solicitado em 2026-08-20. Base para atualizar `PROMPT.md` **quando** os itens de spec forem entrar
+> em execução. Regra do projeto: **feature nova / mudança relevante → spec** (fluxo Spec Kit em PR próprio);
+> **ajuste pontual → direto, sem spec**.
+>
+> **Decisão da usuária (2026-08-20):** o número de pagantes é **informado no Calculador** (por mês) e
+> **persistido**; o card "Total Pagantes" do Dashboard apenas **lê** esse valor. Logo os itens **12 e 13 são
+> acoplados** — 12 cria o armazenamento e 13 o consome. O item 14 permanece **direto**. Decidido também
+> **não** exibir pagantes na tela de Despesas (o conceito vive no Calculador + Dashboard).
+>
+> **Status:** itens 12 + 13 foram consolidados numa **spec única** — **Spec 011 (Calculador de Dívidas +
+> card "Total Pagantes")**, já pronta como bloco do `/speckit-specify` em `PROMPT.md`. Item 14 segue como
+> ajuste direto.
+
+### Pode ser feito por Spec
+
+#### A — Calculador de Dívidas (item 12)
+
+Nova opção no menu (`components/layout/app-sidebar.tsx`, array `NAV_ITEMS`, ícone `lucide-react` — ex.:
+`Calculator`) apontando para uma página nova (ex.: `/debt-calculator`). Na página o usuário **escolhe o mês**;
+o sistema mostra o **total de despesas daquele mês** e um campo para informar o **número de pagantes**. Com o
+número informado, exibe o **valor por pagante** (ex.: Julho, total R$ 1.000,00, dividido por 3 → R$ 333,33).
+O número de pagantes é **persistido por `(residência, mês)`** para o Dashboard poder exibi-lo (item 13).
+
+Contexto atual (já verificado):
+
+- Já existe `getAvailableMonths(householdId)` em `data/expenses.ts` (agrupa `dueDate` por mês) e
+  `lib/report-period.ts` com `toMonthValue` / `formatMonthLabel` — reaproveitar para o seletor/recorte de mês.
+- `getDashboardSummary(householdId, period)` (`data/dashboard.ts`) já sabe agregar o total por mês (`dueDate`)
+  — reaproveitar a lógica de recorte para obter o total do mês.
+- `formatCentsAsCurrency` em `lib/money.ts` para exibir os valores.
+- Despesas **sem `dueDate`** existem (nullable) e hoje não entram em nenhum mês.
+
+O que a spec precisa definir:
+
+- **Persistência dos pagantes (exige migration):** novo model no Prisma para guardar o número de pagantes por
+  mês (ex.: `MonthlyPayers { householdId, year, month, payersCount }` com `@@unique([householdId, year, month])`),
+  ou campo equivalente. Mutação via Server Action (`next-safe-action` + `protectedActionClient`, `.inputSchema`),
+  autorizada pela residência ativa; leitura via `data/`.
+- **Total do mês:** obter o total de despesas do mês selecionado via `data/` (reusar o recorte por `dueDate`),
+  sem chamar Prisma de componente.
+- **Divisão por N pagantes:** N inteiro ≥ 1; valor por pagante = total ÷ N. Definir o **arredondamento**
+  (ex.: `Math.round` em centavos) e o tratamento do **resto** (ex.: exibir só o valor por pagante, sem
+  "acerto de sobra") — documentar a decisão.
+- **Despesas sem `dueDate`:** decidir se entram num bucket "Sem data" ou ficam fora do cálculo — documentar.
+- **Estados vazios:** mensagem quando a residência não tem despesas com mês / quando pagantes ainda não foi
+  informado.
+
+Fora de escopo: exportação; comparação entre meses. **Exige migration** (armazenar pagantes por mês).
+
+#### B — Dashboard: card "Total Pagantes" (item 13)
+
+Novo card no Dashboard exibindo o **número de pagantes que o usuário informou no Calculador** para o mês
+selecionado. **Depende do item 12**, que cria o armazenamento — este item apenas **lê** esse valor.
+
+> **Nota de sequenciamento:** como 13 consome o dado que 12 grava, há duas opções: (a) **uma spec só** que
+> entrega Calculador + card (mais simples de coordenar a migration); (b) **duas specs** com 12 antes de 13.
+> Recomendação: avaliar juntar numa spec só, já que compartilham o mesmo model/migration.
+
+O que a spec precisa definir:
+
+- **Fonte via `data/`:** função que retorna o número de pagantes do mês selecionado (ex.:
+  `getMonthlyPayersCount(householdId, period)`), lendo o registro persistido pelo Calculador — sem Prisma em
+  componente.
+- **`SummaryCards`:** hoje só renderiza valores em R$ (`formatCentsAsCurrency`); adaptar para suportar um
+  **tile de contagem** (número inteiro, sem R$) sem quebrar os cards atuais. Ícone `lucide-react` (ex.:
+  `Users`), tokens de tema, medidas em `rem`.
+- **Interação com o filtro de mês (spec 010):** o card **varia por mês** (é o valor informado para aquele mês);
+  quando não houver pagantes informado para o mês, definir o estado (ex.: "—" ou "não informado").
+
+### Pode ser feito direto (por Você)
+
+#### C — Despesas: "Total das Despesas" (item 14) — `ajuste`
+
+Somar as despesas listadas e exibir o **Total das Despesas** na página de Despesas
+(`app/(app)/expenses/page.tsx`). Deve **respeitar o filtro de mês** já existente na página (a soma reflete
+o recorte selecionado). Reaproveitar `formatCentsAsCurrency` (`lib/money.ts`); calcular a soma no `data/`
+(ou derivar do resultado já carregado) — sem chamar Prisma de componente. Usar componentes shadcn/ui,
+tokens de tema e `rem`. É só uma adição de UI + soma; **não precisa de spec**.
+
+> **Decidido não incluir "Total Pagantes" na tela de Despesas.** O número de pagantes é parâmetro de rateio,
+> não dado de despesa; mantê-lo só no Calculador (onde se informa) + Dashboard (onde se resume) evita espalhar
+> o conceito por três telas. Despesas exibe apenas o Total das Despesas.
 
 ## Sequência de execução acordada
 

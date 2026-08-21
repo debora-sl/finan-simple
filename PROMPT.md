@@ -12,41 +12,60 @@
 
 ---
 
-## Spec 010 — Dashboard: relatórios por mês (Média)
+## Spec 011 — Calculador de Dívidas + card "Total Pagantes" no Dashboard (Média)
 
-Adiciona ao Dashboard a opção de **filtrar/mostrar os relatórios por mês**. Hoje o Dashboard
-(`app/(app)/dashboard/page.tsx`) sempre agrega **todas** as despesas da residência ativa, sem recorte
-temporal. Esta spec introduz um seletor de mês que recorta total, pago, pendente e distribuição por
-categoria por `dueDate`, e — como sugestão dobrada — aplica o mesmo recorte na página de Despesas para
-manter a experiência consistente nos dois lugares.
+Entrega, numa **spec única**, duas partes acopladas: (1) uma nova página **Calculador de Dívidas** onde o
+usuário escolhe um mês, vê o total de despesas daquele mês e informa quantos **pagantes** vão dividir a
+conta, obtendo o valor por pagante; e (2) um card **Total Pagantes** no Dashboard que exibe o número de
+pagantes informado para o mês selecionado. As duas partes compartilham o mesmo armazenamento (o número de
+pagantes por mês), por isso vão juntas: o Calculador **grava** o dado e o card do Dashboard **lê**.
+
+Exemplo do fluxo: em Julho o total de despesas é R$ 1.000,00; o usuário informa 3 pagantes → o Calculador
+mostra R$ 333,33 por pagante e guarda "3 pagantes em Julho"; o card do Dashboard, com Julho selecionado,
+mostra "3".
 
 Contexto atual (já verificado):
 
-- `data/dashboard.ts` (`getDashboardSummary(householdId)`) agrega total, pago, pendente e distribuição por
-  categoria de **todas** as despesas, sem filtro de data.
-- A despesa (`Expense` em `prisma/schema.prisma`) tem `dueDate` e `paidDate` como `DateTime? @db.Date` (ambos
-  **nullable**), com índice `@@index([householdId, dueDate])`. Datas de despesa vieram da spec 005.
-- A UI usa `SummaryCards` e `CategoryBreakdown`; o cofrinho (`getHouseholdSavings`) é saldo acumulado, não
-  mensal.
-- A página de Despesas (`app/(app)/expenses/page.tsx` + `data/expenses.ts`) também lista tudo sem recorte de
-  mês.
+- **Não existe conceito de pagante** em `Expense` (`prisma/schema.prisma`): o model só tem `description`,
+  `amountInCents`, `dueDate`/`paidDate` (`DateTime? @db.Date`, nullable), `categoryId`, `householdId`.
+- Já existe `getAvailableMonths(householdId)` em `data/expenses.ts` (agrupa `dueDate` por mês) e
+  `lib/report-period.ts` com `toMonthValue` / `formatMonthLabel` — reaproveitar para o seletor e o recorte.
+- `getDashboardSummary(householdId, period)` em `data/dashboard.ts` já agrega o total por mês via `dueDate`
+  (recorte `{ gte, lt }`) — reaproveitar a lógica para obter o total do mês no Calculador.
+- `formatCentsAsCurrency` em `lib/money.ts` para exibir valores em R$.
+- `SummaryCards` (`components/dashboard/summary-cards.tsx`) hoje **só** renderiza valores monetários
+  (`formatCentsAsCurrency`) — não sabe exibir uma contagem inteira.
+- Menu em `components/layout/app-sidebar.tsx` (array `NAV_ITEMS`); ícones via `lucide-react`.
 
 O que a spec precisa definir:
 
-- **Seletor de mês**: controle (shadcn `Select` ou similar) que lista os meses disponíveis e escolhe o mês do
-  relatório. Definir o campo de referência (`dueDate` como mês da despesa) e o padrão inicial (mês atual ou
-  "Todos"). Decidir o tratamento de despesas **sem `dueDate`** (bucket "Sem data" / fora do recorte) e
-  documentar. Usar apenas componentes shadcn/ui e tokens de tema; medidas em `rem`; ícones `lucide-react`.
-- **Meses disponíveis via `data/`**: expor em `data/dashboard.ts` a lista de meses com despesas na residência
-  (para popular o seletor), sem chamar Prisma de componente.
-- **Agregação por mês**: `getDashboardSummary` passa a aceitar o mês/intervalo e filtra total, pago, pendente e
-  distribuição por categoria por esse recorte, sem quebrar os consumidores atuais. Refletir em `SummaryCards` e
-  `CategoryBreakdown`.
-- **Estados vazios**: manter o "nenhuma despesa" já existente, agora coerente com o mês selecionado.
-- **Cofrinho**: decidir explicitamente se o card é afetado pelo mês (recomendação: **não**, por ser saldo
-  acumulado).
-- **Consistência com Despesas (sugestão dobrada)**: aplicar o **mesmo filtro de mês na página de Despesas**,
-  reutilizando o seletor e a lógica de recorte, para o usuário ter a mesma experiência nos dois lugares.
+- **Persistência dos pagantes por mês (exige migration)**: novo model no Prisma para guardar o número de
+  pagantes por residência e mês (ex.: `MonthlyPayers { id, householdId, year, month, payersCount, ... }` com
+  `@@unique([householdId, year, month])` e `onDelete: Cascade` na residência). Definir a migration.
+- **Gravação via Server Action**: criar/atualizar o número de pagantes do mês com `next-safe-action` +
+  `protectedActionClient` (usando `.inputSchema`), na pasta `actions/`, autorizando pela residência ativa
+  do usuário (só membros da residência podem gravar). `revalidatePath` das rotas afetadas.
+- **Leitura via `data/`**: funções que retornam (a) o total de despesas do mês selecionado e (b) o número de
+  pagantes gravado para aquele mês (ex.: `getMonthlyPayersCount(householdId, period)`), sem chamar Prisma de
+  componente.
+- **Nova página + item no menu**: rota nova (ex.: `/debt-calculator`) e entrada em `NAV_ITEMS` com ícone
+  `lucide-react` (ex.: `Calculator`). Seletor de mês reutilizando os meses disponíveis; ao escolher o mês,
+  mostrar o total do mês e um campo para o número de pagantes (N inteiro ≥ 1).
+- **Cálculo do valor por pagante**: valor por pagante = total ÷ N. Definir e documentar o **arredondamento**
+  (ex.: `Math.round` em centavos) e o tratamento do **resto** (recomendação: exibir apenas o valor por
+  pagante, sem "acerto de sobra").
+- **Card no Dashboard**: adaptar `SummaryCards` para suportar um **tile de contagem** (número inteiro, sem
+  R$), sem quebrar os cards monetários atuais. Ícone `lucide-react` (ex.: `Users`). O card **varia com o mês
+  selecionado** no Dashboard (spec 010); quando não houver pagantes informado para o mês, definir o estado
+  (ex.: "—" ou "não informado").
+- **Despesas sem `dueDate`**: decidir se entram num bucket "Sem data" ou ficam fora do Calculador e do card —
+  documentar (coerente com a decisão da spec 010).
+- **Estados vazios**: mensagem quando a residência não tem despesas com mês, e quando o número de pagantes
+  ainda não foi informado.
 
-Fora de escopo: comparação entre meses/série temporal; exportação de relatório; migration; filtro por intervalo
-customizado (só recorte por mês).
+Restrições e padrões: usar **apenas** componentes shadcn/ui e tokens de tema (`app/globals.css`); medidas em
+`rem`; ícones `lucide-react`; Prisma só em `data/`; mutações via Server Actions conforme acima; ESLint limpo.
+
+Fora de escopo: exibir "Total Pagantes" na tela de Despesas (decidido manter só no Calculador + Dashboard);
+comparação entre meses/série temporal; exportação de relatório; rateio desigual entre pagantes; edição de
+pagantes fora do Calculador.
