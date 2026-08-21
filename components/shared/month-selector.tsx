@@ -12,9 +12,10 @@ const ALL_MONTHS_VALUE = "all";
 type MonthSelectorProps = {
   months: AvailableMonth[];
   value: string;
+  includeAllOption?: boolean;
 };
 
-export function MonthSelector({ months, value }: MonthSelectorProps) {
+export function MonthSelector({ months, value, includeAllOption = true }: MonthSelectorProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -43,18 +44,18 @@ export function MonthSelector({ months, value }: MonthSelectorProps) {
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
+  const items = includeAllOption
+    ? [{ value: ALL_MONTHS_VALUE, label: "Todos os meses" }, ...options]
+    : options;
+
   return (
-    <Select
-      value={value}
-      onValueChange={handleValueChange}
-      items={[{ value: ALL_MONTHS_VALUE, label: "Todos os meses" }, ...options]}
-    >
+    <Select value={value} onValueChange={handleValueChange} items={items}>
       <SelectTrigger>
         <CalendarDays className="text-muted-foreground" />
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={ALL_MONTHS_VALUE}>Todos os meses</SelectItem>
+        {includeAllOption && <SelectItem value={ALL_MONTHS_VALUE}>Todos os meses</SelectItem>}
         {options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}

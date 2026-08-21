@@ -36,7 +36,8 @@ model Household {
   invitations    Invitation[]
   expenses       Expense[]
   categories     Category[]
-  activeForUsers User[]       @relation("ActiveHousehold")
+  monthlyPayers  MonthlyPayers[]
+  activeForUsers User[]          @relation("ActiveHousehold")
 
   @@map("household")
 }
@@ -107,6 +108,22 @@ model Expense {
   @@index([householdId, dueDate])
   @@index([householdId, categoryId])
   @@map("expense")
+}
+
+model MonthlyPayers {
+  id          String   @id @default(cuid())
+  householdId String
+  year        Int
+  month       Int
+  payersCount Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, year, month])
+  @@index([householdId])
+  @@map("monthly_payers")
 }
 
 model Session {

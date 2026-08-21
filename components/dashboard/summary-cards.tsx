@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, PiggyBank, Wallet } from "lucide-react";
+import { CheckCircle2, Clock, PiggyBank, Users, Wallet } from "lucide-react";
 
 import { formatCentsAsCurrency } from "@/lib/money";
 import { cn } from "@/lib/utils";
@@ -14,12 +14,12 @@ const TONE_CLASSES: Record<Tone, string> = {
 
 function SummaryTile({
   label,
-  valueInCents,
+  value,
   tone,
   icon: Icon,
 }: {
   label: string;
-  valueInCents: number;
+  value: React.ReactNode;
   tone: Tone;
   icon: React.ComponentType<{ className?: string }>;
 }) {
@@ -36,9 +36,7 @@ function SummaryTile({
         </span>
         <div className="flex flex-col gap-0.5">
           <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="cf-money text-xl font-semibold text-foreground">
-            {formatCentsAsCurrency(valueInCents)}
-          </p>
+          <p className="cf-money text-xl font-semibold text-foreground">{value}</p>
         </div>
       </CardContent>
     </Card>
@@ -50,18 +48,46 @@ export function SummaryCards({
   paidInCents,
   pendingInCents,
   savingsInCents,
+  payersCount,
 }: {
   totalInCents: number;
   paidInCents: number;
   pendingInCents: number;
   savingsInCents: number;
+  payersCount: number | null;
 }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <SummaryTile label="Total Despesas" valueInCents={totalInCents} tone="action" icon={Wallet} />
-      <SummaryTile label="Pago" valueInCents={paidInCents} tone="positive" icon={CheckCircle2} />
-      <SummaryTile label="Pendente" valueInCents={pendingInCents} tone="warning" icon={Clock} />
-      <SummaryTile label="Cofrinho" valueInCents={savingsInCents} tone="positive" icon={PiggyBank} />
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <SummaryTile
+        label="Total Despesas"
+        value={formatCentsAsCurrency(totalInCents)}
+        tone="action"
+        icon={Wallet}
+      />
+      <SummaryTile
+        label="Pago"
+        value={formatCentsAsCurrency(paidInCents)}
+        tone="positive"
+        icon={CheckCircle2}
+      />
+      <SummaryTile
+        label="Pendente"
+        value={formatCentsAsCurrency(pendingInCents)}
+        tone="warning"
+        icon={Clock}
+      />
+      <SummaryTile
+        label="Cofrinho"
+        value={formatCentsAsCurrency(savingsInCents)}
+        tone="positive"
+        icon={PiggyBank}
+      />
+      <SummaryTile
+        label="Total Pagantes"
+        value={payersCount !== null ? payersCount : "—"}
+        tone="action"
+        icon={Users}
+      />
     </div>
   );
 }

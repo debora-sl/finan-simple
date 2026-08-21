@@ -4,6 +4,7 @@ import { getActiveHousehold } from "@/lib/active-household";
 import { resolveReportPeriod, periodToValue } from "@/lib/report-period";
 import { getDashboardSummary } from "@/data/dashboard";
 import { getAvailableMonths } from "@/data/expenses";
+import { getMonthlyPayers } from "@/data/payers";
 import { getHouseholdSavings } from "@/data/savings";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { CategoryBreakdown } from "@/components/dashboard/category-breakdown";
@@ -16,10 +17,11 @@ type DashboardPageProps = {
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const { householdId } = await getActiveHousehold();
   const period = resolveReportPeriod((await searchParams).month);
-  const [summary, savingsInCents, months] = await Promise.all([
+  const [summary, savingsInCents, months, payersCount] = await Promise.all([
     getDashboardSummary(householdId, period),
     getHouseholdSavings(householdId),
     getAvailableMonths(householdId),
+    period.kind === "month" ? getMonthlyPayers(householdId, period.year, period.month) : null,
   ]);
 
   return (
@@ -39,6 +41,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         paidInCents={summary.paidInCents}
         pendingInCents={summary.pendingInCents}
         savingsInCents={savingsInCents}
+        payersCount={payersCount}
       />
 
       {summary.hasExpenses ? (
